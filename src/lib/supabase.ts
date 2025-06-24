@@ -10,6 +10,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 const defaultUrl = 'https://placeholder.supabase.co';
+
 const defaultKey = 'placeholder-key';
 
 export const supabase = createClient(

@@ -2,10 +2,11 @@
 
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Copy, Check, Gift } from 'lucide-react';
+import { Copy, Check } from 'lucide-react';
 
 const BankContainer = styled.section`
-  padding: ${props => props.theme.spacing.section} ${props => props.theme.spacing.lg};
+  padding: ${props => props.theme.spacing.section}
+    ${props => props.theme.spacing.lg};
   background: ${props => props.theme.colors.secondary};
 `;
 
@@ -34,7 +35,7 @@ const CurrencyGrid = styled.div`
   gap: ${props => props.theme.spacing.xl};
   max-width: 1200px;
   margin: 0 auto;
-  
+
   @media (max-width: ${props => props.theme.breakpoints.sm}) {
     grid-template-columns: 1fr;
     gap: ${props => props.theme.spacing.lg};
@@ -80,7 +81,7 @@ const CurrencyTitle = styled.h3`
 
 const BankDetail = styled.div`
   margin-bottom: ${props => props.theme.spacing.md};
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -111,7 +112,8 @@ const DetailText = styled.span`
 `;
 
 const CopyButton = styled.button<{ $copied?: boolean }>`
-  background: ${props => props.$copied ? props.theme.colors.success : props.theme.colors.primary};
+  background: ${props =>
+    props.$copied ? props.theme.colors.success : props.theme.colors.primary};
   color: white;
   border: none;
   padding: ${props => props.theme.spacing.xs} ${props => props.theme.spacing.sm};
@@ -122,12 +124,12 @@ const CopyButton = styled.button<{ $copied?: boolean }>`
   align-items: center;
   gap: 4px;
   font-size: 0.8rem;
-  
+
   &:hover {
     opacity: 0.9;
     transform: translateY(-1px);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
@@ -146,28 +148,28 @@ interface BankAccount {
 
 const bankAccounts: BankAccount[] = [
   {
-    currency: 'Nigerian Naira',
-    currencyCode: 'NGN',
-    accountName: 'Sarah & Michael Wedding',
-    accountNumber: '1234567890',
-    bankName: 'First Bank of Nigeria'
-  },
-  {
     currency: 'Euro',
     currencyCode: 'EUR',
-    accountName: 'Sarah & Michael Wedding',
-    iban: 'IE29 AIBK 9311 5212 3456 78',
-    swift: 'AIBKIE2D',
-    bankName: 'Allied Irish Banks'
+    accountName: 'Oluwadurotimi Mejabi',
+    iban: 'IE82 REVO 9903 6075 6982 54',
+    swift: 'REVOIE23',
+    bankName: 'Revolut Bank UAB',
+  },
+  {
+    currency: 'Nigerian Naira',
+    currencyCode: 'NGN',
+    accountName: 'Oluwadurotimi Mejabi',
+    accountNumber: '0249564539',
+    bankName: 'Guaranty Trust Bank',
   },
   {
     currency: 'US Dollar',
     currencyCode: 'USD',
-    accountName: 'Sarah & Michael Wedding',
-    accountNumber: '987654321',
-    routingNumber: '021000021',
-    bankName: 'Bank of America'
-  }
+    accountName: 'Oluwadurotimi Mejabi',
+    iban: 'IE82 REVO 9903 6075 6982 54',
+    swift: 'REVOIE23',
+    bankName: 'Revolut Bank UAB',
+  },
 ];
 
 export function BankDetailsSection() {
@@ -185,30 +187,35 @@ export function BankDetailsSection() {
 
   return (
     <BankContainer id="gifts">
-      <SectionTitle>Monetary Blessings</SectionTitle>
+      <SectionTitle>Gifts & Registry</SectionTitle>
       <SectionSubtitle>
-        Your presence at our wedding is the greatest gift of all. However, if you wish to honor us with a monetary gift, here are our account details.
+        Your presence at our wedding is the greatest gift of all. However, if
+        you wish to honor us with a monetary gift, you can do so below!
       </SectionSubtitle>
-      
+
       <CurrencyGrid>
         {bankAccounts.map((account, index) => (
           <CurrencyCard key={index}>
             <CurrencyHeader>
-              <CurrencyIcon>
-                {account.currencyCode}
-              </CurrencyIcon>
+              <CurrencyIcon>{account.currencyCode}</CurrencyIcon>
               <CurrencyTitle>{account.currency}</CurrencyTitle>
             </CurrencyHeader>
-            
+
             <BankDetail>
               <DetailLabel>Account Name</DetailLabel>
               <DetailValue>
                 <DetailText>{account.accountName}</DetailText>
                 <CopyButton
                   $copied={copiedItem === `${index}-name`}
-                  onClick={() => copyToClipboard(account.accountName, `${index}-name`)}
+                  onClick={() =>
+                    copyToClipboard(account.accountName, `${index}-name`)
+                  }
                 >
-                  {copiedItem === `${index}-name` ? <Check size={12} /> : <Copy size={12} />}
+                  {copiedItem === `${index}-name` ? (
+                    <Check size={12} />
+                  ) : (
+                    <Copy size={12} />
+                  )}
                   {copiedItem === `${index}-name` ? 'Copied' : 'Copy'}
                 </CopyButton>
               </DetailValue>
@@ -221,9 +228,18 @@ export function BankDetailsSection() {
                   <DetailText>{account.accountNumber}</DetailText>
                   <CopyButton
                     $copied={copiedItem === `${index}-account`}
-                    onClick={() => copyToClipboard(account.accountNumber!, `${index}-account`)}
+                    onClick={() =>
+                      copyToClipboard(
+                        account.accountNumber!,
+                        `${index}-account`
+                      )
+                    }
                   >
-                    {copiedItem === `${index}-account` ? <Check size={12} /> : <Copy size={12} />}
+                    {copiedItem === `${index}-account` ? (
+                      <Check size={12} />
+                    ) : (
+                      <Copy size={12} />
+                    )}
                     {copiedItem === `${index}-account` ? 'Copied' : 'Copy'}
                   </CopyButton>
                 </DetailValue>
@@ -237,9 +253,15 @@ export function BankDetailsSection() {
                   <DetailText>{account.iban}</DetailText>
                   <CopyButton
                     $copied={copiedItem === `${index}-iban`}
-                    onClick={() => copyToClipboard(account.iban!, `${index}-iban`)}
+                    onClick={() =>
+                      copyToClipboard(account.iban!, `${index}-iban`)
+                    }
                   >
-                    {copiedItem === `${index}-iban` ? <Check size={12} /> : <Copy size={12} />}
+                    {copiedItem === `${index}-iban` ? (
+                      <Check size={12} />
+                    ) : (
+                      <Copy size={12} />
+                    )}
                     {copiedItem === `${index}-iban` ? 'Copied' : 'Copy'}
                   </CopyButton>
                 </DetailValue>
@@ -253,9 +275,15 @@ export function BankDetailsSection() {
                   <DetailText>{account.swift}</DetailText>
                   <CopyButton
                     $copied={copiedItem === `${index}-swift`}
-                    onClick={() => copyToClipboard(account.swift!, `${index}-swift`)}
+                    onClick={() =>
+                      copyToClipboard(account.swift!, `${index}-swift`)
+                    }
                   >
-                    {copiedItem === `${index}-swift` ? <Check size={12} /> : <Copy size={12} />}
+                    {copiedItem === `${index}-swift` ? (
+                      <Check size={12} />
+                    ) : (
+                      <Copy size={12} />
+                    )}
                     {copiedItem === `${index}-swift` ? 'Copied' : 'Copy'}
                   </CopyButton>
                 </DetailValue>
@@ -269,9 +297,18 @@ export function BankDetailsSection() {
                   <DetailText>{account.routingNumber}</DetailText>
                   <CopyButton
                     $copied={copiedItem === `${index}-routing`}
-                    onClick={() => copyToClipboard(account.routingNumber!, `${index}-routing`)}
+                    onClick={() =>
+                      copyToClipboard(
+                        account.routingNumber!,
+                        `${index}-routing`
+                      )
+                    }
                   >
-                    {copiedItem === `${index}-routing` ? <Check size={12} /> : <Copy size={12} />}
+                    {copiedItem === `${index}-routing` ? (
+                      <Check size={12} />
+                    ) : (
+                      <Copy size={12} />
+                    )}
                     {copiedItem === `${index}-routing` ? 'Copied' : 'Copy'}
                   </CopyButton>
                 </DetailValue>
@@ -284,9 +321,15 @@ export function BankDetailsSection() {
                 <DetailText>{account.bankName}</DetailText>
                 <CopyButton
                   $copied={copiedItem === `${index}-bank`}
-                  onClick={() => copyToClipboard(account.bankName, `${index}-bank`)}
+                  onClick={() =>
+                    copyToClipboard(account.bankName, `${index}-bank`)
+                  }
                 >
-                  {copiedItem === `${index}-bank` ? <Check size={12} /> : <Copy size={12} />}
+                  {copiedItem === `${index}-bank` ? (
+                    <Check size={12} />
+                  ) : (
+                    <Copy size={12} />
+                  )}
                   {copiedItem === `${index}-bank` ? 'Copied' : 'Copy'}
                 </CopyButton>
               </DetailValue>
@@ -296,4 +339,4 @@ export function BankDetailsSection() {
       </CurrencyGrid>
     </BankContainer>
   );
-} 
+}

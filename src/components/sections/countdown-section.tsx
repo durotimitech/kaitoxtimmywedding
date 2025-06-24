@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const CountdownContainer = styled.section`
-  padding: ${props => props.theme.spacing.section} ${props => props.theme.spacing.lg};
+  padding: ${props => props.theme.spacing.section}
+    ${props => props.theme.spacing.lg};
   background: ${props => props.theme.colors.background};
   position: relative;
   overflow: hidden;
@@ -17,7 +18,7 @@ const ContentWrapper = styled.div`
   grid-template-columns: 350px 1fr;
   gap: ${props => props.theme.spacing.xxxl};
   align-items: center;
-  
+
   @media (max-width: ${props => props.theme.breakpoints.lg}) {
     grid-template-columns: 1fr;
     gap: ${props => props.theme.spacing.xl};
@@ -42,7 +43,7 @@ const HexagonFrame = styled.div`
 const HexagonImage = styled.div`
   width: 100%;
   height: 100%;
-  background-image: url('https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&h=400&fit=crop&crop=faces');
+  background-image: url('/3.jpg');
   background-size: cover;
   background-position: center;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
@@ -66,7 +67,7 @@ const FloralDecoration = styled.div<{ $position: string }>`
   `)}') no-repeat center;
   background-size: contain;
   z-index: 1;
-  
+
   ${props => {
     switch (props.$position) {
       case 'top-left':
@@ -102,7 +103,7 @@ const CountdownContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  
+
   @media (max-width: ${props => props.theme.breakpoints.lg}) {
     align-items: center;
   }
@@ -115,7 +116,7 @@ const CoupleNames = styled.h2`
   margin-bottom: ${props => props.theme.spacing.xl};
   text-align: center;
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -134,7 +135,7 @@ const CountdownGrid = styled.div`
   gap: ${props => props.theme.spacing.lg};
   width: 100%;
   max-width: 500px;
-  
+
   @media (max-width: ${props => props.theme.breakpoints.sm}) {
     grid-template-columns: repeat(2, 1fr);
     gap: ${props => props.theme.spacing.md};
@@ -174,11 +175,11 @@ const DecorativeIcon = styled.div<{ $index: number }>`
     </svg>
   `)}') no-repeat center;
   background-size: contain;
-  
+
   @media (max-width: ${props => props.theme.breakpoints.sm}) {
     display: none;
   }
-  
+
   ${props => props.$index === 3 && `display: none;`}
 `;
 
@@ -194,11 +195,11 @@ export function CountdownSection() {
     days: 0,
     hours: 0,
     minutes: 0,
-    seconds: 0
+    seconds: 0,
   });
 
   useEffect(() => {
-    const targetDate = new Date('2024-10-26T16:00:00').getTime();
+    const targetDate = new Date('2025-08-06T12:00:00').getTime();
 
     const timer = setInterval(() => {
       const now = new Date().getTime();
@@ -207,9 +208,11 @@ export function CountdownSection() {
       if (difference > 0) {
         setTimeLeft({
           days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          hours: Math.floor(
+            (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          ),
           minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((difference % (1000 * 60)) / 1000)
+          seconds: Math.floor((difference % (1000 * 60)) / 1000),
         });
       }
     }, 1000);
@@ -221,7 +224,7 @@ export function CountdownSection() {
     { value: timeLeft.days, label: 'Days' },
     { value: timeLeft.hours, label: 'Hours' },
     { value: timeLeft.minutes, label: 'Minutes' },
-    { value: timeLeft.seconds, label: 'Second' }
+    { value: timeLeft.seconds, label: 'Seconds' },
   ];
 
   return (
@@ -236,14 +239,16 @@ export function CountdownSection() {
             <FloralDecoration $position="bottom-right" />
           </HexagonFrame>
         </PhotoSection>
-        
+
         <CountdownContent>
-          <CoupleNames>Sarah & Michael</CoupleNames>
-          
+          <CoupleNames>Kaito & Timmy</CoupleNames>
+
           <CountdownGrid>
             {timeUnits.map((unit, index) => (
               <TimeUnit key={unit.label}>
-                <TimeNumber>{unit.value.toString().padStart(2, '0')}</TimeNumber>
+                <TimeNumber>
+                  {unit.value.toString().padStart(2, '0')}
+                </TimeNumber>
                 <TimeLabel>{unit.label}</TimeLabel>
                 <DecorativeIcon $index={index} />
               </TimeUnit>
@@ -253,4 +258,4 @@ export function CountdownSection() {
       </ContentWrapper>
     </CountdownContainer>
   );
-} 
+}

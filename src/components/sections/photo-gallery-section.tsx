@@ -3,9 +3,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const GalleryContainer = styled.section`
-  padding: ${props => props.theme.spacing.section} ${props => props.theme.spacing.lg};
+  padding: ${props => props.theme.spacing.section}
+    ${props => props.theme.spacing.lg};
   background: ${props => props.theme.colors.secondary};
 `;
 
@@ -35,7 +38,8 @@ const PhotoGrid = styled.div`
   gap: ${props => props.theme.spacing.lg};
   max-width: 1200px;
   margin: 0 auto;
-  
+  margin-bottom: ${props => props.theme.spacing.xl};
+
   @media (max-width: ${props => props.theme.breakpoints.sm}) {
     grid-template-columns: 1fr;
     gap: ${props => props.theme.spacing.md};
@@ -47,9 +51,11 @@ const PhotoCard = styled.div`
   overflow: hidden;
   border-radius: ${props => props.theme.borderRadius.lg};
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   box-shadow: ${props => props.theme.shadows.md};
-  
+
   &:hover {
     transform: translateY(-5px);
     box-shadow: ${props => props.theme.shadows.lg};
@@ -61,7 +67,7 @@ const PhotoImage = styled.img`
   height: 300px;
   object-fit: cover;
   transition: transform 0.3s ease;
-  
+
   ${PhotoCard}:hover & {
     transform: scale(1.05);
   }
@@ -81,9 +87,41 @@ const PhotoOverlay = styled.div`
   justify-content: center;
   color: white;
   font-weight: 500;
-  
+
   ${PhotoCard}:hover & {
     opacity: 1;
+  }
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: ${props => props.theme.spacing.xl};
+`;
+
+const PhotobookButton = styled(Button)`
+  background: ${props => props.theme.colors.primary};
+  color: white;
+  padding: ${props => props.theme.spacing.md} ${props => props.theme.spacing.xl};
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: ${props => props.theme.borderRadius.sm};
+  transition: all 0.3s ease;
+  outline: none;
+
+  &:hover {
+    background: ${props => props.theme.colors.primary};
+    transform: translateY(-2px);
+    box-shadow: ${props => props.theme.shadows.lg};
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:active {
+    outline: none;
   }
 `;
 
@@ -128,9 +166,18 @@ const CloseButton = styled.button`
   border-radius: ${props => props.theme.borderRadius.full};
   cursor: pointer;
   transition: background 0.2s;
-  
+  outline: none;
+
   &:hover {
     background: rgba(255, 255, 255, 0.2);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:active {
+    outline: none;
   }
 `;
 
@@ -145,14 +192,23 @@ const NavButton = styled.button`
   border-radius: ${props => props.theme.borderRadius.full};
   cursor: pointer;
   transition: background 0.2s;
-  
+  outline: none;
+
   &:hover {
     background: rgba(255, 255, 255, 0.2);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:active {
+    outline: none;
   }
 `;
 
@@ -164,37 +220,38 @@ const NextButton = styled(NavButton)`
   right: -60px;
 `;
 
-const photos = [
+// Only show first 6 photos in the preview
+const previewPhotos = [
   {
     id: 1,
-    src: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=400&fit=crop&crop=faces',
-    alt: 'Romantic wedding moment'
-  },
-  {
-    id: 2,
-    src: 'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=600&h=400&fit=crop&crop=faces',
-    alt: 'Wedding couple dancing'
-  },
-  {
-    id: 3,
-    src: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&h=400&fit=crop&crop=center',
-    alt: 'Wedding ceremony'
+    src: '/1.jpg',
+    alt: 'Romantic wedding moment',
   },
   {
     id: 4,
-    src: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600&h=400&fit=crop&crop=faces',
-    alt: 'Wedding portrait'
+    src: '/4.jpg',
+    alt: 'Wedding portrait',
+  },
+  {
+    id: 2,
+    src: '/2.jpg',
+    alt: 'Wedding couple dancing',
   },
   {
     id: 5,
-    src: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=600&h=400&fit=crop&crop=faces',
-    alt: 'Wedding kiss'
+    src: '/5.jpg',
+    alt: 'Wedding kiss',
   },
   {
     id: 6,
-    src: 'https://images.unsplash.com/photo-1465495976277-4387d4b0e4a6?w=600&h=400&fit=crop&crop=faces',
-    alt: 'Wedding couple'
-  }
+    src: '/6.jpg',
+    alt: 'Wedding couple',
+  },
+  {
+    id: 3,
+    src: '/3.jpg',
+    alt: 'Wedding ceremony',
+  },
 ];
 
 export function PhotoGallerySection() {
@@ -210,53 +267,63 @@ export function PhotoGallerySection() {
 
   const goToPrevious = () => {
     if (selectedPhoto === null) return;
-    const currentIndex = photos.findIndex(p => p.id === selectedPhoto);
-    const previousIndex = currentIndex > 0 ? currentIndex - 1 : photos.length - 1;
-    setSelectedPhoto(photos[previousIndex].id);
+    const currentIndex = previewPhotos.findIndex(p => p.id === selectedPhoto);
+    const previousIndex =
+      currentIndex > 0 ? currentIndex - 1 : previewPhotos.length - 1;
+    setSelectedPhoto(previewPhotos[previousIndex].id);
   };
 
   const goToNext = () => {
     if (selectedPhoto === null) return;
-    const currentIndex = photos.findIndex(p => p.id === selectedPhoto);
-    const nextIndex = currentIndex < photos.length - 1 ? currentIndex + 1 : 0;
-    setSelectedPhoto(photos[nextIndex].id);
+    const currentIndex = previewPhotos.findIndex(p => p.id === selectedPhoto);
+    const nextIndex =
+      currentIndex < previewPhotos.length - 1 ? currentIndex + 1 : 0;
+    setSelectedPhoto(previewPhotos[nextIndex].id);
   };
 
-  const selectedPhotoData = photos.find(p => p.id === selectedPhoto);
+  const selectedPhotoData = previewPhotos.find(p => p.id === selectedPhoto);
 
   return (
     <>
       <GalleryContainer id="gallery">
         <SectionTitle>Our Wedding Gallery</SectionTitle>
         <SectionSubtitle>
-          A glimpse into our journey together and the moments that brought us here.
+          A glimpse into our journey together and the moments that brought us
+          here.
         </SectionSubtitle>
-        
+
         <PhotoGrid>
-          {photos.map((photo) => (
+          {previewPhotos.map(photo => (
             <PhotoCard key={photo.id} onClick={() => openLightbox(photo.id)}>
               <PhotoImage src={photo.src} alt={photo.alt} />
-              <PhotoOverlay>
-                Click to view larger
-              </PhotoOverlay>
+              <PhotoOverlay>Click to view larger</PhotoOverlay>
             </PhotoCard>
           ))}
         </PhotoGrid>
+
+        <ButtonContainer>
+          <Link href="/photobook" passHref>
+            <PhotobookButton>See full Photobook</PhotobookButton>
+          </Link>
+        </ButtonContainer>
       </GalleryContainer>
 
       {selectedPhoto && selectedPhotoData && (
         <Lightbox onClick={closeLightbox}>
-          <LightboxContent onClick={(e) => e.stopPropagation()}>
+          <LightboxContent onClick={e => e.stopPropagation()}>
             <CloseButton onClick={closeLightbox}>
               <X size={24} />
             </CloseButton>
-            
+
             <PrevButton onClick={goToPrevious}>
               <ChevronLeft size={24} />
             </PrevButton>
-            
-            <LightboxImage src={selectedPhotoData.src} alt={selectedPhotoData.alt} />
-            
+
+            <LightboxImage
+              src={selectedPhotoData.src}
+              alt={selectedPhotoData.alt}
+            />
+
             <NextButton onClick={goToNext}>
               <ChevronRight size={24} />
             </NextButton>
@@ -265,4 +332,4 @@ export function PhotoGallerySection() {
       )}
     </>
   );
-} 
+}

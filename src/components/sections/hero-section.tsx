@@ -2,6 +2,8 @@
 
 import styled, { keyframes } from 'styled-components';
 import { Button } from '@/components/ui/button';
+import { ReservationModal } from '@/components/ui/modal';
+import { useState } from 'react';
 
 const fadeIn = keyframes`
   from {
@@ -15,14 +17,15 @@ const fadeIn = keyframes`
 `;
 
 const HeroContainer = styled.section`
-  padding: 120px ${props => props.theme.spacing.lg} ${props => props.theme.spacing.section};
+  padding: 120px ${props => props.theme.spacing.lg}
+    ${props => props.theme.spacing.section};
   background: ${props => props.theme.colors.secondary};
   min-height: 100vh;
   display: flex;
   align-items: center;
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -30,7 +33,11 @@ const HeroContainer = styled.section`
     right: 0;
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+    background: radial-gradient(
+      circle,
+      rgba(212, 175, 55, 0.1) 0%,
+      transparent 70%
+    );
     border-radius: 50%;
   }
 `;
@@ -42,7 +49,7 @@ const ContentWrapper = styled.div`
   grid-template-columns: 1fr 1.2fr;
   gap: ${props => props.theme.spacing.xxxl};
   align-items: center;
-  
+
   @media (max-width: ${props => props.theme.breakpoints.lg}) {
     grid-template-columns: 1fr;
     gap: ${props => props.theme.spacing.xl};
@@ -71,16 +78,10 @@ const MainTitle = styled.h1`
   margin-bottom: ${props => props.theme.spacing.lg};
 `;
 
-const Description = styled.p`
-  font-size: 1.1rem;
-  color: ${props => props.theme.colors.textLight};
-  line-height: 1.6;
-  margin-bottom: ${props => props.theme.spacing.xl};
-  max-width: 500px;
-`;
+// Removed unused Description component
 
 const CTAButton = styled(Button)`
-  background: ${props => props.theme.colors.darkBrown};
+  background: ${props => props.theme.colors.primary};
   color: white;
   padding: ${props => props.theme.spacing.md} ${props => props.theme.spacing.xl};
   font-size: 1rem;
@@ -88,11 +89,20 @@ const CTAButton = styled(Button)`
   border: none;
   border-radius: ${props => props.theme.borderRadius.sm};
   transition: all 0.3s ease;
-  
+  outline: none;
+
   &:hover {
     background: ${props => props.theme.colors.primary};
     transform: translateY(-2px);
     box-shadow: ${props => props.theme.shadows.lg};
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:active {
+    outline: none;
   }
 `;
 
@@ -100,7 +110,7 @@ const ImageCollage = styled.div`
   position: relative;
   height: 500px;
   animation: ${fadeIn} 1.8s ease-out 0.3s both;
-  
+
   @media (max-width: ${props => props.theme.breakpoints.lg}) {
     height: 400px;
   }
@@ -112,11 +122,11 @@ const ImageFrame = styled.div<{ $position: string }>`
   overflow: hidden;
   box-shadow: ${props => props.theme.shadows.xl};
   transition: transform 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-5px);
   }
-  
+
   ${props => {
     switch (props.$position) {
       case 'large':
@@ -147,7 +157,7 @@ const ImageFrame = styled.div<{ $position: string }>`
         return '';
     }
   }}
-  
+
   @media (max-width: ${props => props.theme.breakpoints.lg}) {
     ${props => {
       switch (props.$position) {
@@ -199,46 +209,44 @@ const DecorativeElement = styled.div`
 `;
 
 export function HeroSection() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleReserveClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
-    <HeroContainer id="hero">
-      <ContentWrapper>
-        <TextContent>
-          <Subtitle>Elegant Weddings</Subtitle>
-          <MainTitle>
-            Bringing Your<br />
-            Dream Wedding<br />
-            to Life
-          </MainTitle>
-          <Description>
-            A Celebration of Love: Our Extravagant Wedding Website where every moment becomes a cherished memory.
-          </Description>
-          <CTAButton onClick={() => document.getElementById('rsvp')?.scrollIntoView({ behavior: 'smooth' })}>
-            Book A Consult
-          </CTAButton>
-        </TextContent>
-        
-        <ImageCollage>
-          <ImageFrame $position="large">
-            <Image 
-              src="https://images.unsplash.com/photo-1519741497674-611481863552?w=400&h=600&fit=crop&crop=faces"
-              alt="Romantic wedding moment"
-            />
-          </ImageFrame>
-          <ImageFrame $position="medium">
-            <Image 
-              src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=400&h=600&fit=crop&crop=faces"
-              alt="Wedding couple dancing"
-            />
-          </ImageFrame>
-          <ImageFrame $position="small">
-            <Image 
-              src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&h=600&fit=crop&crop=faces"
-              alt="Wedding ceremony"
-            />
-          </ImageFrame>
-          <DecorativeElement />
-        </ImageCollage>
-      </ContentWrapper>
-    </HeroContainer>
+    <>
+      <HeroContainer id="hero">
+        <ContentWrapper>
+          <TextContent>
+            <Subtitle>#AGizdodoLoveStory</Subtitle>
+            <MainTitle>Come celebrate this important day with us!</MainTitle>
+            <CTAButton onClick={handleReserveClick}>
+              Reserve your special spot!
+            </CTAButton>
+          </TextContent>
+
+          <ImageCollage>
+            <ImageFrame $position="large">
+              <Image src="/1.jpg" alt="Romantic wedding moment" />
+            </ImageFrame>
+            <ImageFrame $position="medium">
+              <Image src="/4.jpg" alt="Wedding couple dancing" />
+            </ImageFrame>
+            <ImageFrame $position="small">
+              <Image src="/5.jpg" alt="Wedding ceremony" />
+            </ImageFrame>
+            <DecorativeElement />
+          </ImageCollage>
+        </ContentWrapper>
+      </HeroContainer>
+
+      <ReservationModal isOpen={isModalOpen} onClose={handleCloseModal} />
+    </>
   );
-} 
+}

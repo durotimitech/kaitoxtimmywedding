@@ -4,7 +4,8 @@ import styled from 'styled-components';
 import { MapPin, Clock, Calendar, Shirt } from 'lucide-react';
 
 const CeremonyContainer = styled.section`
-  padding: ${props => props.theme.spacing.section} ${props => props.theme.spacing.lg};
+  padding: ${props => props.theme.spacing.section}
+    ${props => props.theme.spacing.lg};
   background: ${props => props.theme.colors.background};
 `;
 
@@ -17,17 +18,11 @@ const SectionTitle = styled.h2`
 `;
 
 const DetailsContainer = styled.div`
-  max-width: 1000px;
+  max-width: 600px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: ${props => props.theme.spacing.xxl};
-  align-items: start;
-  
-  @media (max-width: ${props => props.theme.breakpoints.md}) {
-    grid-template-columns: 1fr;
-    gap: ${props => props.theme.spacing.xl};
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const InfoCard = styled.div`
@@ -40,7 +35,7 @@ const InfoCard = styled.div`
 
 const InfoSection = styled.div`
   margin-bottom: ${props => props.theme.spacing.xl};
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -79,42 +74,17 @@ const EventTitle = styled.h3`
   text-align: center;
 `;
 
-const MapContainer = styled.div`
-  background: ${props => props.theme.colors.secondary};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  overflow: hidden;
-  box-shadow: ${props => props.theme.shadows.md};
-  border: 1px solid ${props => props.theme.colors.border};
-`;
-
-const MapPlaceholder = styled.div`
-  width: 100%;
-  height: 400px;
-  background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${props => props.theme.colors.textLight};
-  font-size: 1.1rem;
-  text-align: center;
-  padding: ${props => props.theme.spacing.lg};
-`;
-
-const MapFrame = styled.iframe`
-  width: 100%;
-  height: 400px;
-  border: none;
-`;
+// Removed unused map components: MapContainer, MapPlaceholder, MapFrame
 
 export function CeremonyDetailsSection() {
   return (
     <CeremonyContainer id="ceremony">
       <SectionTitle>Ceremony Details</SectionTitle>
-      
+
       <DetailsContainer>
         <InfoCard>
           <EventTitle>The Ceremony</EventTitle>
-          
+
           <InfoSection>
             <InfoHeader>
               <InfoIcon>
@@ -122,9 +92,7 @@ export function CeremonyDetailsSection() {
               </InfoIcon>
               <InfoTitle>Date</InfoTitle>
             </InfoHeader>
-            <InfoContent>
-              Saturday, October 26, 2024
-            </InfoContent>
+            <InfoContent>Monday, September 8, 2025</InfoContent>
           </InfoSection>
 
           <InfoSection>
@@ -134,9 +102,7 @@ export function CeremonyDetailsSection() {
               </InfoIcon>
               <InfoTitle>Time</InfoTitle>
             </InfoHeader>
-            <InfoContent>
-              4:00 PM - 11:00 PM
-            </InfoContent>
+            <InfoContent>14:00 PM</InfoContent>
           </InfoSection>
 
           <InfoSection>
@@ -147,10 +113,12 @@ export function CeremonyDetailsSection() {
               <InfoTitle>Location</InfoTitle>
             </InfoHeader>
             <InfoContent>
-              <strong>The Grand Ballroom</strong><br />
-              123 Wedding Venue Road<br />
-              Limerick, Ireland<br />
-              V94 X8Y2
+              <strong>The Strand Hotel</strong>
+              <br />
+              Limerick City
+              <br />
+              Limerick, Ireland
+              <br />
             </InfoContent>
           </InfoSection>
 
@@ -162,33 +130,11 @@ export function CeremonyDetailsSection() {
               <InfoTitle>Dress Code</InfoTitle>
             </InfoHeader>
             <InfoContent>
-              Formal Attire<br />
-              <em>Cocktail dresses and suits are encouraged</em>
+              <em>Blush Pink & Navy Blue</em>
             </InfoContent>
           </InfoSection>
         </InfoCard>
-
-        <MapContainer>
-          <MapPlaceholder>
-            <div>
-              <MapPin size={48} style={{ margin: '0 auto 16px', display: 'block' }} />
-              <div>Interactive Map</div>
-              <div style={{ fontSize: '0.9rem', marginTop: '8px' }}>
-                Map will be embedded here<br />
-                (Google Maps integration placeholder)
-              </div>
-            </div>
-          </MapPlaceholder>
-          {/* Uncomment and replace with actual Google Maps embed when ready
-          <MapFrame
-            src="about:blank"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Wedding Venue Location"
-          />
-          */}
-        </MapContainer>
       </DetailsContainer>
     </CeremonyContainer>
   );
-} 
+}

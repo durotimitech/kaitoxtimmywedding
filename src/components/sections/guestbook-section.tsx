@@ -1,14 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import styled, { keyframes } from 'styled-components';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Heart, MessageCircle, Send } from 'lucide-react';
+import { Heart, MessageCircle, Send, X } from 'lucide-react';
+import { getMessages, addMessage } from '@/lib/messages';
+import { Message } from '@/lib/supabase';
+
+const slideDown = keyframes`
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+`;
 
 const GuestbookContainer = styled.section`
-  padding: ${props => props.theme.spacing.section} ${props => props.theme.spacing.lg};
+  padding: ${props => props.theme.spacing.section}
+    ${props => props.theme.spacing.lg};
   background: ${props => props.theme.colors.background};
 `;
 
@@ -24,7 +34,7 @@ const SectionSubtitle = styled.p`
   font-size: 1.2rem;
   color: ${props => props.theme.colors.textLight};
   text-align: center;
-  margin-bottom: ${props => props.theme.spacing.xxl};
+  margin-bottom: ${props => props.theme.spacing.xl};
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
@@ -34,68 +44,82 @@ const SectionSubtitle = styled.p`
 const ContentContainer = styled.div`
   max-width: 800px;
   margin: 0 auto;
-  display: grid;
-  gap: ${props => props.theme.spacing.xxl};
-  
-  @media (max-width: ${props => props.theme.breakpoints.md}) {
-    gap: ${props => props.theme.spacing.xl};
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: ${props => props.theme.spacing.xl};
 `;
 
-const FormContainer = styled.div`
-  background: white;
-  border-radius: ${props => props.theme.borderRadius.lg};
-  padding: ${props => props.theme.spacing.xl};
-  box-shadow: ${props => props.theme.shadows.md};
-  border: 1px solid ${props => props.theme.colors.border};
-`;
-
-const FormTitle = styled.h3`
-  font-size: 1.3rem;
-  font-weight: 500;
-  color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.lg};
+const SendMessageButton = styled(Button)`
+  background: ${props => props.theme.colors.primary};
+  color: white;
+  padding: ${props => props.theme.spacing.md} ${props => props.theme.spacing.xl};
+  font-size: 1.1rem;
+  border-radius: ${props => props.theme.borderRadius.full};
   display: flex;
   align-items: center;
   gap: ${props => props.theme.spacing.sm};
-`;
+  transition: all 0.3s ease;
+  outline: none;
 
-const FormField = styled.div`
-  margin-bottom: ${props => props.theme.spacing.lg};
-`;
+  &:hover {
+    background: #d92384;
+    transform: translateY(-2px);
+    box-shadow: ${props => props.theme.shadows.lg};
+  }
 
-const Label = styled.label`
-  display: block;
-  font-weight: 500;
-  color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.sm};
-  font-size: 0.95rem;
-`;
-
-const TextArea = styled.textarea`
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius.md};
-  background: white;
-  color: ${props => props.theme.colors.text};
-  font-size: 1rem;
-  resize: vertical;
-  min-height: 120px;
-  font-family: inherit;
-  transition: border-color 0.2s;
-  
   &:focus {
     outline: none;
-    border-color: ${props => props.theme.colors.primary};
-    box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+  }
+
+  &:active {
+    outline: none;
   }
 `;
 
 const MessagesContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${props => props.theme.spacing.lg};
+  position: relative;
+  height: 600px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: ${props => props.theme.borderRadius.lg};
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.05)
+  );
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: linear-gradient(
+      to bottom,
+      rgba(254, 252, 248, 1),
+      rgba(254, 252, 248, 0)
+    );
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: linear-gradient(
+      to top,
+      rgba(254, 252, 248, 1),
+      rgba(254, 252, 248, 0)
+    );
+    z-index: 2;
+    pointer-events: none;
+  }
 `;
 
 const MessagesTitle = styled.h3`
@@ -106,6 +130,20 @@ const MessagesTitle = styled.h3`
   display: flex;
   align-items: center;
   gap: ${props => props.theme.spacing.sm};
+  text-align: center;
+  justify-content: center;
+`;
+
+const AnimatedMessagesWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: ${props => props.theme.spacing.lg};
+  animation: ${slideDown} 30s linear infinite;
+  padding: ${props => props.theme.spacing.lg} 0;
+
+  @media (max-width: ${props => props.theme.breakpoints.md}) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const MessageCard = styled.div`
@@ -115,7 +153,9 @@ const MessageCard = styled.div`
   box-shadow: ${props => props.theme.shadows.sm};
   border: 1px solid ${props => props.theme.colors.border};
   position: relative;
-  
+  min-height: 120px;
+  margin: 0 ${props => props.theme.spacing.md};
+
   &::before {
     content: '';
     position: absolute;
@@ -131,12 +171,7 @@ const MessageCard = styled.div`
   }
 `;
 
-const MessageAuthor = styled.div`
-  font-weight: 600;
-  color: ${props => props.theme.colors.primary};
-  font-size: 1rem;
-  margin-bottom: ${props => props.theme.spacing.sm};
-`;
+// Removed unused MessageAuthor
 
 const MessageText = styled.div`
   color: ${props => props.theme.colors.text};
@@ -150,156 +185,317 @@ const MessageDate = styled.div`
   margin-top: ${props => props.theme.spacing.sm};
 `;
 
+const LoadingMessage = styled.div`
+  text-align: center;
+  color: ${props => props.theme.colors.textLight};
+  font-size: 1rem;
+  padding: ${props => props.theme.spacing.xl};
+`;
+
+const ErrorMessage = styled.div`
+  text-align: center;
+  color: ${props => props.theme.colors.error};
+  font-size: 1rem;
+  padding: ${props => props.theme.spacing.xl};
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: ${props => props.theme.borderRadius.md};
+  margin: ${props => props.theme.spacing.lg} 0;
+`;
+
+// Modal Styles
+const ModalOverlay = styled.div<{ $isOpen: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: ${props => (props.$isOpen ? 'flex' : 'none')};
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  outline: none;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:active {
+    outline: none;
+  }
+`;
+
+const ModalTitle = styled.h2`
+  font-size: 24px;
+  font-weight: 600;
+  color: ${props => props.theme.colors.text};
+  margin-bottom: 16px;
+  text-align: center;
+`;
+
+const ModalMessage = styled.p`
+  font-size: 16px;
+  line-height: 1.6;
+  color: ${props => props.theme.colors.textLight};
+  text-align: center;
+  margin-bottom: 24px;
+`;
+
+const TextArea = styled.textarea`
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid ${props => props.theme.colors.border};
+  border-radius: ${props => props.theme.borderRadius.md};
+  background: white;
+  color: ${props => props.theme.colors.text};
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  margin-bottom: ${props => props.theme.spacing.lg};
+
+  &:focus {
+    outline: none;
+    border-color: ${props => props.theme.colors.primary};
+    box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+  }
+`;
+
 const SuccessMessage = styled.div`
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.2);
   color: ${props => props.theme.colors.success};
   padding: ${props => props.theme.spacing.md};
   border-radius: ${props => props.theme.borderRadius.md};
-  margin-top: ${props => props.theme.spacing.md};
+  margin-bottom: ${props => props.theme.spacing.md};
   display: flex;
   align-items: center;
   gap: ${props => props.theme.spacing.sm};
 `;
 
-interface Message {
-  id: number;
-  name: string;
-  message: string;
-  date: string;
+interface GuestbookSectionProps {
+  isModalOpen: boolean;
+  onOpenModal: () => void;
+  onCloseModal: () => void;
 }
 
-interface GuestbookFormData {
-  name: string;
-  message: string;
-}
+// Helper function to format date
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-const initialMessages: Message[] = [
-  {
-    id: 1,
-    name: 'Emily & James',
-    message: 'So excited to celebrate your special day with you both! Wishing you a lifetime of love and happiness together. ❤️',
-    date: '2 days ago'
-  },
-  {
-    id: 2,
-    name: 'The Williams Family',
-    message: 'Congratulations on your engagement! We are thrilled to be part of your wedding celebration. See you soon!',
-    date: '1 week ago'
-  }
-];
+  if (diffInSeconds < 60) return 'Just now';
+  if (diffInSeconds < 3600)
+    return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+  if (diffInSeconds < 86400)
+    return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+  if (diffInSeconds < 604800)
+    return `${Math.floor(diffInSeconds / 86400)} days ago`;
 
-export function GuestbookSection() {
-  const [formData, setFormData] = useState<GuestbookFormData>({
-    name: '',
-    message: '',
-  });
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  return date.toLocaleDateString();
+};
+
+export function GuestbookSection({
+  isModalOpen,
+  onOpenModal,
+  onCloseModal,
+}: GuestbookSectionProps) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [messageText, setMessageText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  // Fetch messages on component mount
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const fetchedMessages = await getMessages();
+        setMessages(fetchedMessages);
+      } catch (err) {
+        console.error('Error fetching messages:', err);
+        setError('Failed to load messages. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMessages();
+
+    // Cleanup subscription on unmount
+    return () => {
+      // No cleanup needed
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!messageText.trim()) return;
+
     setIsSubmitting(true);
+    setError(null);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      // Add message to Supabase
+      await addMessage(messageText.trim());
 
-    // Add new message to the list
-    const newMessage: Message = {
-      id: messages.length + 1,
-      name: formData.name,
-      message: formData.message,
-      date: 'Just now'
-    };
+      // Reset form and show success
+      setMessageText('');
+      setShowSuccess(true);
 
-    setMessages(prev => [newMessage, ...prev]);
-    setFormData({ name: '', message: '' });
-    setShowSuccess(true);
-    setIsSubmitting(false);
-
-    // Hide success message after 3 seconds
-    setTimeout(() => setShowSuccess(false), 3000);
+      // Hide success message and close modal after 3 seconds
+      setTimeout(() => {
+        setShowSuccess(false);
+        onCloseModal();
+      }, 3000);
+    } catch (err) {
+      console.error('Error submitting message:', err);
+      setError('Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const handleModalClose = () => {
+    onCloseModal();
+    setMessageText('');
+    setShowSuccess(false);
+    setError(null);
+  };
+
+  // Duplicate messages for seamless infinite scroll
+  const duplicatedMessages =
+    messages.length > 0 ? [...messages, ...messages] : [];
 
   return (
     <GuestbookContainer id="messages">
       <SectionTitle>Kind Messages</SectionTitle>
       <SectionSubtitle>
-        Leave us a message! We'd love to hear your thoughts, wishes, and advice as we begin this new chapter together.
+        Leave us a message! We&apos;d love to hear your thoughts, wishes, and
+        advice as we begin this new chapter together.
       </SectionSubtitle>
-      
+
       <ContentContainer>
-        <FormContainer>
-          <FormTitle>
-            <MessageCircle size={20} />
-            Share Your Message
-          </FormTitle>
-          
+        <SendMessageButton onClick={onOpenModal}>
+          <MessageCircle size={20} />
+          Send Message
+        </SendMessageButton>
+
+        <MessagesTitle>
+          <Heart size={20} />
+        </MessagesTitle>
+
+        <MessagesContainer>
+          {isLoading ? (
+            <LoadingMessage>Loading messages...</LoadingMessage>
+          ) : error ? (
+            <ErrorMessage>{error}</ErrorMessage>
+          ) : messages.length === 0 ? (
+            <LoadingMessage>
+              No messages yet. Be the first to leave a message!
+            </LoadingMessage>
+          ) : (
+            <AnimatedMessagesWrapper>
+              {duplicatedMessages.map((message, index) => (
+                <MessageCard key={`${message.id}-${index}`}>
+                  <MessageText>{message.message}</MessageText>
+                  <MessageDate>
+                    {formatDate(message.created_at || '')}
+                  </MessageDate>
+                </MessageCard>
+              ))}
+            </AnimatedMessagesWrapper>
+          )}
+        </MessagesContainer>
+      </ContentContainer>
+
+      {/* Message Modal */}
+      <ModalOverlay
+        $isOpen={isModalOpen}
+        onClick={e => {
+          if (e.target === e.currentTarget) {
+            handleModalClose();
+          }
+        }}
+      >
+        <ModalContent>
+          <CloseButton onClick={handleModalClose}>
+            <X size={20} />
+          </CloseButton>
+          <ModalTitle>Share Your Message</ModalTitle>
+          <ModalMessage>
+            Send us your thoughts, wishes, or advice as we begin this new
+            chapter together.
+          </ModalMessage>
+
+          {showSuccess && (
+            <SuccessMessage>
+              <Heart size={16} />
+              Thank you for your beautiful message! It means the world to us.
+            </SuccessMessage>
+          )}
+
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+
           <form onSubmit={handleSubmit}>
-            <FormField>
-              <Label htmlFor="guestbook-name">Your Name *</Label>
-              <Input
-                id="guestbook-name"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                required
-                className="bg-white border-[#E5D5C8] focus:border-[#8B7355]"
-                placeholder="Enter your name"
-              />
-            </FormField>
-
-            <FormField>
-              <Label htmlFor="guestbook-message">Your Message *</Label>
-              <TextArea
-                id="guestbook-message"
-                name="message"
-                value={formData.message}
-                onChange={handleInputChange}
-                required
-                placeholder="Share your thoughts, wishes, or advice for the happy couple..."
-              />
-            </FormField>
-
-            <Button
-              type="submit"
+            <TextArea
+              value={messageText}
+              onChange={e => setMessageText(e.target.value)}
+              placeholder="Share your thoughts, wishes, or advice for the happy couple..."
+              required
               disabled={isSubmitting}
+            />
+
+            <SendMessageButton
+              type="submit"
+              disabled={isSubmitting || !messageText.trim()}
               className="w-full bg-[#8B7355] hover:bg-[#7A6348] text-white py-3 text-lg"
+              style={{ outline: 'none' }}
             >
               <Send size={18} className="mr-2" />
               {isSubmitting ? 'Sending...' : 'Send Message'}
-            </Button>
-
-            {showSuccess && (
-              <SuccessMessage>
-                <Heart size={16} />
-                Thank you for your beautiful message! It means the world to us.
-              </SuccessMessage>
-            )}
+            </SendMessageButton>
           </form>
-        </FormContainer>
-
-        <MessagesContainer>
-          <MessagesTitle>
-            <Heart size={20} />
-            Messages from Our Loved Ones ({messages.length})
-          </MessagesTitle>
-          
-          {messages.map((message) => (
-            <MessageCard key={message.id}>
-              <MessageAuthor>{message.name}</MessageAuthor>
-              <MessageText>{message.message}</MessageText>
-              <MessageDate>{message.date}</MessageDate>
-            </MessageCard>
-          ))}
-        </MessagesContainer>
-      </ContentContainer>
+        </ModalContent>
+      </ModalOverlay>
     </GuestbookContainer>
   );
-} 
+}

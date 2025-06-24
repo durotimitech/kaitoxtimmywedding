@@ -8,7 +8,7 @@ const NavContainer = styled.nav`
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(254, 252, 248, 0.95);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid ${props => props.theme.colors.border};
   z-index: 1000;
@@ -22,17 +22,28 @@ const NavContent = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 0 ${props => props.theme.spacing.lg};
-  
+  position: relative;
+
   @media (max-width: ${props => props.theme.breakpoints.md}) {
     padding: 0 ${props => props.theme.spacing.md};
   }
 `;
 
-const NavLinks = styled.div`
+const LeftNavLinks = styled.div`
   display: flex;
   align-items: center;
   gap: ${props => props.theme.spacing.xl};
-  
+
+  @media (max-width: ${props => props.theme.breakpoints.md}) {
+    display: none;
+  }
+`;
+
+const RightNavLinks = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing.xl};
+
   @media (max-width: ${props => props.theme.breakpoints.md}) {
     display: none;
   }
@@ -45,13 +56,25 @@ const NavLink = styled.a`
   font-size: 0.95rem;
   transition: color 0.2s;
   cursor: pointer;
-  
+  outline: none;
+
   &:hover {
     color: ${props => props.theme.colors.primary};
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:active {
+    outline: none;
   }
 `;
 
 const Logo = styled.div`
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: ${props => props.theme.spacing.sm};
@@ -59,6 +82,11 @@ const Logo = styled.div`
   font-size: 1.8rem;
   color: ${props => props.theme.colors.primary};
   font-weight: 600;
+
+  @media (max-width: ${props => props.theme.breakpoints.md}) {
+    position: static;
+    transform: none;
+  }
 `;
 
 const LogoIcon = styled.div`
@@ -70,6 +98,36 @@ const LogoIcon = styled.div`
   align-items: center;
   justify-content: center;
   color: white;
+`;
+
+const MobileMenuButton = styled.button`
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  outline: none;
+
+  @media (max-width: ${props => props.theme.breakpoints.md}) {
+    display: flex;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:active {
+    outline: none;
+  }
+`;
+
+const MenuLine = styled.div`
+  width: 24px;
+  height: 2px;
+  background: ${props => props.theme.colors.text};
+  transition: all 0.2s ease;
 `;
 
 const smoothScrollTo = (elementId: string) => {
@@ -88,22 +146,28 @@ export function Navigation() {
   return (
     <NavContainer>
       <NavContent>
+        <LeftNavLinks>
+          <NavLink onClick={() => smoothScrollTo('hero')}>Home</NavLink>
+          <NavLink onClick={() => smoothScrollTo('about')}>About</NavLink>
+        </LeftNavLinks>
+
         <Logo>
           <LogoIcon>
             <Heart size={20} />
           </LogoIcon>
-          Glamourize
+          Kaito x Timmy
         </Logo>
-        
-        <NavLinks>
-          <NavLink onClick={() => smoothScrollTo('hero')}>Home</NavLink>
-          <NavLink onClick={() => smoothScrollTo('about')}>About</NavLink>
-          <NavLink onClick={() => smoothScrollTo('services')}>Service</NavLink>
-          <NavLink onClick={() => smoothScrollTo('gallery')}>Portfolio</NavLink>
-          <NavLink onClick={() => smoothScrollTo('rsvp')}>RSVP</NavLink>
-          <NavLink onClick={() => smoothScrollTo('contact')}>Contact</NavLink>
-        </NavLinks>
+
+        <RightNavLinks>
+          <NavLink onClick={() => smoothScrollTo('gallery')}>Photobook</NavLink>
+        </RightNavLinks>
+
+        <MobileMenuButton>
+          <MenuLine />
+          <MenuLine />
+          <MenuLine />
+        </MobileMenuButton>
       </NavContent>
     </NavContainer>
   );
-} 
+}

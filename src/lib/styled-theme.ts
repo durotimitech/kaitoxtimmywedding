@@ -1,24 +1,21 @@
 export const theme = {
   colors: {
-    primary: '#6B5B73',
+    primary: '#f533a4',
     secondary: '#F8F6F3',
     accent: '#D4AF37',
-    background: '#f0afec',
-    text: '#2D2D2D',
-    textLight: '#8B7D6B',
+    background: '#FEFCF8',
+    text: '#d92384',
+    textLight: '#181933',
     muted: '#B5A692',
     success: '#10B981',
     error: '#EF4444',
-    warning: '#F59E0B',
-    border: '#F3E8FF',
+    border: '#E8E2D5',
     cardBg: '#FFFFFF',
     overlay: 'rgba(0, 0, 0, 0.7)',
     cream: '#F5F2ED',
-    darkBrown: '#4A3B2A',
     lightGold: '#F4E4BC',
   },
   spacing: {
-    baseUnit: '8px',
     xs: '0.25rem',
     sm: '0.5rem',
     md: '1rem',
@@ -27,7 +24,6 @@ export const theme = {
     xxl: '3rem',
     xxxl: '4rem',
     section: '6rem',
-    sectionHorizontal: '48px'
   },
   breakpoints: {
     sm: '640px',
@@ -50,67 +46,10 @@ export const theme = {
     xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
   },
   fonts: {
-    primary: 'Inter, sans-serif',
-    heading: 'Playfair Display, serif',
     body: 'Inter, sans-serif',
+    heading: 'Playfair Display, serif',
     script: 'Dancing Script, cursive',
   },
-  fontSizes: {
-    h1: {
-      desktop: '48px',
-      mobile: '32px'
-    },
-    h2: {
-      desktop: '36px',
-      mobile: '28px'
-    },
-    h3: {
-      desktop: '24px',
-      mobile: '20px'
-    },
-    h4: {
-      desktop: '18px',
-      mobile: '16px'
-    },
-    body: {
-      desktop: '16px',
-      mobile: '14px'
-    }
-  },
-  fontWeights: {
-    normal: 400,
-    medium: 500,
-    semibold: 600,
-    bold: 700
-  },
-  lineHeights: {
-    heading: 1.2,
-    body: 1.6
-  },
-  button: {
-    borderRadius: '12px',
-    padding: {
-      vertical: '12px',
-      horizontal: '24px'
-    },
-    fontSize: '16px',
-    fontWeight: 500
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#F3E8FF',
-    borderWidth: '1px',
-    borderRadius: '12px',
-    padding: '24px'
-  },
-  input: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E5E7EB',
-    borderWidth: '1px',
-    borderRadius: '8px',
-    padding: '12px',
-    fontSize: '16px'
-  }
 } as const;
 
-export type Theme = typeof theme; 
+export type Theme = typeof theme;

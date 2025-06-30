@@ -153,6 +153,22 @@ const ImageFrame = styled.div<{ $position: string }>`
           height: 240px;
           z-index: 1;
         `;
+      case 'extra1':
+        return `
+          bottom: 40px;
+          left: 60px;
+          width: 160px;
+          height: 200px;
+          z-index: 5;
+        `;
+      case 'extra2':
+        return `
+          top: 120px;
+          left: 180px;
+          width: 140px;
+          height: 180px;
+          z-index: 4;
+        `;
       default:
         return '';
     }
@@ -177,6 +193,20 @@ const ImageFrame = styled.div<{ $position: string }>`
           return `
             width: 140px;
             height: 180px;
+          `;
+        case 'extra1':
+          return `
+            width: 120px;
+            height: 160px;
+            bottom: 30px;
+            left: 40px;
+          `;
+        case 'extra2':
+          return `
+            width: 100px;
+            height: 130px;
+            top: 100px;
+            left: 140px;
           `;
         default:
           return '';
@@ -233,13 +263,19 @@ export function HeroSection() {
 
           <ImageCollage>
             <ImageFrame $position="large">
-              <Image src="/1.jpg" alt="Romantic wedding moment" />
+              <Image src="/9.jpg" alt="Romantic wedding moment" />
             </ImageFrame>
             <ImageFrame $position="medium">
-              <Image src="/4.jpg" alt="Wedding couple dancing" />
+              <Image src="/1.jpg" alt="Wedding couple dancing" />
             </ImageFrame>
             <ImageFrame $position="small">
               <Image src="/5.jpg" alt="Wedding ceremony" />
+            </ImageFrame>
+            <ImageFrame $position="extra1">
+              <Image src="/8.jpg" alt="Wedding celebration" />
+            </ImageFrame>
+            <ImageFrame $position="extra2">
+              <Image src="/4.jpg" alt="Wedding portrait" />
             </ImageFrame>
             <DecorativeElement />
           </ImageCollage>

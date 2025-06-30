@@ -199,6 +199,8 @@ const allPhotos = [
   { id: 6, src: '/6.jpg', alt: 'Wedding moment 6' },
   { id: 7, src: '/7.jpg', alt: 'Wedding moment 7' },
   { id: 3, src: '/3.jpg', alt: 'Wedding moment 3' },
+  { id: 8, src: '/8.jpg', alt: 'Wedding moment 8' },
+  { id: 9, src: '/9.jpg', alt: 'Wedding moment 9' },
 ];
 
 export default function PhotobookPage() {

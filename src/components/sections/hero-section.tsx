@@ -1,20 +1,9 @@
 'use client';
 
-import styled, { keyframes } from 'styled-components';
-import { Button } from '@/components/ui/button';
+import styled from 'styled-components';
+import { motion } from 'motion/react';
 import { ReservationModal } from '@/components/ui/modal';
 import { useState } from 'react';
-
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
 
 const HeroContainer = styled.section`
   padding: 120px ${props => props.theme.spacing.lg}
@@ -57,8 +46,8 @@ const ContentWrapper = styled.div`
   }
 `;
 
-const TextContent = styled.div`
-  animation: ${fadeIn} 1.5s ease-out;
+const TextContent = styled(motion.div)`
+  /* Removed CSS animation in favor of Motion animations */
 `;
 
 const Subtitle = styled.div`
@@ -80,7 +69,7 @@ const MainTitle = styled.h1`
 
 // Removed unused Description component
 
-const CTAButton = styled(Button)`
+const CTAButton = styled(motion.button)`
   background: ${props => props.theme.colors.primary};
   color: white;
   padding: ${props => props.theme.spacing.md} ${props => props.theme.spacing.xl};
@@ -88,44 +77,29 @@ const CTAButton = styled(Button)`
   font-weight: 500;
   border: none;
   border-radius: ${props => props.theme.borderRadius.sm};
-  transition: all 0.3s ease;
   outline: none;
-
-  &:hover {
-    background: ${props => props.theme.colors.primary};
-    transform: translateY(-2px);
-    box-shadow: ${props => props.theme.shadows.lg};
-  }
+  cursor: pointer;
 
   &:focus {
     outline: none;
   }
-
-  &:active {
-    outline: none;
-  }
 `;
 
-const ImageCollage = styled.div`
+const ImageCollage = styled(motion.div)`
   position: relative;
   height: 500px;
-  animation: ${fadeIn} 1.8s ease-out 0.3s both;
 
   @media (max-width: ${props => props.theme.breakpoints.lg}) {
     height: 400px;
   }
 `;
 
-const ImageFrame = styled.div<{ $position: string }>`
+const ImageFrame = styled(motion.div)<{ $position: string }>`
   position: absolute;
   border-radius: ${props => props.theme.borderRadius.lg};
   overflow: hidden;
   box-shadow: ${props => props.theme.shadows.xl};
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-  }
+  cursor: pointer;
 
   ${props => {
     switch (props.$position) {
@@ -253,28 +227,126 @@ export function HeroSection() {
     <>
       <HeroContainer id="hero">
         <ContentWrapper>
-          <TextContent>
-            <Subtitle>#AGizdodoLoveStory</Subtitle>
-            <MainTitle>Come celebrate this important day with us!</MainTitle>
-            <CTAButton onClick={handleReserveClick}>
-              Reserve your special spot!
-            </CTAButton>
+          <TextContent
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <Subtitle>#AGizdodoLoveStory</Subtitle>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <MainTitle>Come celebrate this important day with us!</MainTitle>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
+              <CTAButton
+                onClick={handleReserveClick}
+                whileHover={{
+                  y: -3,
+                  scale: 1.02,
+                  boxShadow: '0 10px 25px rgba(212, 175, 55, 0.3)',
+                }}
+                whileTap={{
+                  scale: 0.98,
+                  y: -1,
+                }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              >
+                Reserve your special spot!
+              </CTAButton>
+            </motion.div>
           </TextContent>
 
-          <ImageCollage>
-            <ImageFrame $position="large">
+          <ImageCollage
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
+          >
+            <ImageFrame
+              $position="large"
+              initial={{ opacity: 0, y: 30, rotate: -5 }}
+              animate={{ opacity: 1, y: 0, rotate: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              whileHover={{
+                y: -8,
+                rotate: 2,
+                scale: 1.02,
+                zIndex: 10,
+                transition: { type: 'spring', stiffness: 300, damping: 20 },
+              }}
+            >
               <Image src="/9.jpg" alt="Romantic wedding moment" />
             </ImageFrame>
-            <ImageFrame $position="medium">
+            <ImageFrame
+              $position="medium"
+              initial={{ opacity: 0, y: 30, rotate: 5 }}
+              animate={{ opacity: 1, y: 0, rotate: 0 }}
+              transition={{ duration: 0.8, delay: 0.7 }}
+              whileHover={{
+                y: -8,
+                rotate: -2,
+                scale: 1.02,
+                zIndex: 10,
+                transition: { type: 'spring', stiffness: 300, damping: 20 },
+              }}
+            >
               <Image src="/1.jpg" alt="Wedding couple dancing" />
             </ImageFrame>
-            <ImageFrame $position="small">
+            <ImageFrame
+              $position="small"
+              initial={{ opacity: 0, y: 30, rotate: -3 }}
+              animate={{ opacity: 1, y: 0, rotate: 0 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
+              whileHover={{
+                y: -8,
+                rotate: 3,
+                scale: 1.02,
+                zIndex: 10,
+                transition: { type: 'spring', stiffness: 300, damping: 20 },
+              }}
+            >
               <Image src="/5.jpg" alt="Wedding ceremony" />
             </ImageFrame>
-            <ImageFrame $position="extra1">
+            <ImageFrame
+              $position="extra1"
+              initial={{ opacity: 0, y: 30, rotate: 4 }}
+              animate={{ opacity: 1, y: 0, rotate: 0 }}
+              transition={{ duration: 0.8, delay: 1.1 }}
+              whileHover={{
+                y: -8,
+                rotate: -4,
+                scale: 1.02,
+                zIndex: 10,
+                transition: { type: 'spring', stiffness: 300, damping: 20 },
+              }}
+            >
               <Image src="/8.jpg" alt="Wedding celebration" />
             </ImageFrame>
-            <ImageFrame $position="extra2">
+            <ImageFrame
+              $position="extra2"
+              initial={{ opacity: 0, y: 30, rotate: -2 }}
+              animate={{ opacity: 1, y: 0, rotate: 0 }}
+              transition={{ duration: 0.8, delay: 1.3 }}
+              whileHover={{
+                y: -8,
+                rotate: 5,
+                scale: 1.02,
+                zIndex: 10,
+                transition: { type: 'spring', stiffness: 300, damping: 20 },
+              }}
+            >
               <Image src="/4.jpg" alt="Wedding portrait" />
             </ImageFrame>
             <DecorativeElement />

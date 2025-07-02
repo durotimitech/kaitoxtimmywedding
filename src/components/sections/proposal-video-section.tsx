@@ -1,6 +1,7 @@
 'use client';
 
 import styled from 'styled-components';
+import { motion } from 'motion/react';
 import { useState } from 'react';
 
 const ProposalContainer = styled.section`
@@ -11,7 +12,7 @@ const ProposalContainer = styled.section`
   overflow: hidden;
 `;
 
-const ContentWrapper = styled.div`
+const ContentWrapper = styled(motion.div)`
   max-width: 1000px;
   margin: 0 auto;
   text-align: center;
@@ -85,7 +86,7 @@ const LoadingPlaceholder = styled.div`
   }
 `;
 
-const InstagramIcon = styled.div`
+const InstagramIcon = styled(motion.div)`
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -103,6 +104,7 @@ const InstagramIcon = styled.div`
   margin-bottom: ${props => props.theme.spacing.md};
   color: white;
   font-size: 1.5rem;
+  cursor: pointer;
 `;
 
 const PlaceholderText = styled.p`
@@ -150,46 +152,94 @@ export function ProposalVideoSection() {
 
   return (
     <ProposalContainer id="proposal-video">
-      <ContentWrapper>
-        <SectionTitle>Our Proposal Story</SectionTitle>
-        <SectionSubtitle>
-          Relive the magical moment when our love story took its most beautiful
-          turn. Watch how it all began and see the joy that started our journey
-          to forever.
-        </SectionSubtitle>
+      <ContentWrapper
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <SectionTitle>Our Proposal Story</SectionTitle>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <SectionSubtitle>
+            Relive the magical moment when our love story took its most
+            beautiful turn. Watch how it all began and see the joy that started
+            our journey to forever.
+          </SectionSubtitle>
+        </motion.div>
 
-        <VideoContainer>
-          <InstagramWrapper>
-            <InstagramEmbed>
-              {isInstagramLoaded ? (
-                <iframe
-                  src={instagramReelUrl}
-                  width="540"
-                  height="680"
-                  frameBorder="0"
-                  scrolling="no"
-                  allowTransparency={true}
-                  style={{
-                    border: 'none',
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
-                    maxWidth: '100%',
-                  }}
-                />
-              ) : (
-                <LoadingPlaceholder>
-                  <InstagramIcon onClick={() => setIsInstagramLoaded(true)}>
-                    📷
-                  </InstagramIcon>
-                  <PlaceholderText>Our Proposal Reel</PlaceholderText>
-                  <PlaceholderSubtext>
-                    Click to load Instagram reel
-                  </PlaceholderSubtext>
-                </LoadingPlaceholder>
-              )}
-            </InstagramEmbed>
-          </InstagramWrapper>
-        </VideoContainer>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+        >
+          <VideoContainer>
+            <InstagramWrapper>
+              <InstagramEmbed>
+                {isInstagramLoaded ? (
+                  <motion.iframe
+                    src={instagramReelUrl}
+                    width="540"
+                    height="680"
+                    frameBorder="0"
+                    scrolling="no"
+                    allowTransparency={true}
+                    style={{
+                      border: 'none',
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+                      maxWidth: '100%',
+                    }}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                  />
+                ) : (
+                  <LoadingPlaceholder>
+                    <InstagramIcon
+                      onClick={() => setIsInstagramLoaded(true)}
+                      whileHover={{
+                        scale: 1.1,
+                        rotate: 5,
+                        boxShadow: '0 8px 25px rgba(240, 148, 51, 0.4)',
+                      }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 20,
+                      }}
+                    >
+                      📷
+                    </InstagramIcon>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <PlaceholderText>Our Proposal Reel</PlaceholderText>
+                      <PlaceholderSubtext>
+                        Click to load Instagram reel
+                      </PlaceholderSubtext>
+                    </motion.div>
+                  </LoadingPlaceholder>
+                )}
+              </InstagramEmbed>
+            </InstagramWrapper>
+          </VideoContainer>
+        </motion.div>
       </ContentWrapper>
       <DecorativeElement />
     </ProposalContainer>

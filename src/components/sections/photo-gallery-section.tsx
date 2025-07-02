@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { motion, AnimatePresence } from 'motion/react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-const GalleryContainer = styled.section`
+const GalleryContainer = styled(motion.section)`
   padding: ${props => props.theme.spacing.section}
     ${props => props.theme.spacing.lg};
   background: ${props => props.theme.colors.secondary};
@@ -46,20 +47,12 @@ const PhotoGrid = styled.div`
   }
 `;
 
-const PhotoCard = styled.div`
+const PhotoCard = styled(motion.div)`
   position: relative;
   overflow: hidden;
   border-radius: ${props => props.theme.borderRadius.lg};
   cursor: pointer;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
   box-shadow: ${props => props.theme.shadows.md};
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: ${props => props.theme.shadows.lg};
-  }
 `;
 
 const PhotoImage = styled.img`
@@ -125,7 +118,7 @@ const PhotobookButton = styled(Button)`
   }
 `;
 
-const Lightbox = styled.div`
+const Lightbox = styled(motion.div)`
   position: fixed;
   top: 0;
   left: 0;
@@ -146,13 +139,6 @@ const LightboxContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
-
-const LightboxImage = styled.img`
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  border-radius: ${props => props.theme.borderRadius.md};
 `;
 
 const CloseButton = styled.button`
@@ -285,51 +271,141 @@ export function PhotoGallerySection() {
 
   return (
     <>
-      <GalleryContainer id="gallery">
-        <SectionTitle>Our Wedding Gallery</SectionTitle>
-        <SectionSubtitle>
-          A glimpse into our journey together and the moments that brought us
-          here.
-        </SectionSubtitle>
+      <GalleryContainer
+        id="gallery"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.6 }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <SectionTitle>Our Wedding Gallery</SectionTitle>
+          <SectionSubtitle>
+            A glimpse into our journey together and the moments that brought us
+            here.
+          </SectionSubtitle>
+        </motion.div>
 
-        <PhotoGrid>
-          {previewPhotos.map(photo => (
-            <PhotoCard key={photo.id} onClick={() => openLightbox(photo.id)}>
-              <PhotoImage src={photo.src} alt={photo.alt} />
-              <PhotoOverlay>Click to view larger</PhotoOverlay>
-            </PhotoCard>
-          ))}
-        </PhotoGrid>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <PhotoGrid>
+            {previewPhotos.map((photo, index) => (
+              <PhotoCard
+                key={photo.id}
+                onClick={() => openLightbox(photo.id)}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.5,
+                  delay: 0.6 + index * 0.1,
+                  type: 'spring',
+                  stiffness: 100,
+                }}
+                whileHover={{
+                  y: -8,
+                  scale: 1.02,
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+                  transition: { type: 'spring', stiffness: 300, damping: 20 },
+                }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <PhotoImage src={photo.src} alt={photo.alt} />
+                <PhotoOverlay>Click to view larger</PhotoOverlay>
+              </PhotoCard>
+            ))}
+          </PhotoGrid>
+        </motion.div>
 
-        <ButtonContainer>
-          <Link href="/photobook" passHref>
-            <PhotobookButton>See full Photobook</PhotobookButton>
-          </Link>
-        </ButtonContainer>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 1.2 }}
+        >
+          <ButtonContainer>
+            <Link href="/photobook" passHref>
+              <PhotobookButton>See full Photobook</PhotobookButton>
+            </Link>
+          </ButtonContainer>
+        </motion.div>
       </GalleryContainer>
 
-      {selectedPhoto && selectedPhotoData && (
-        <Lightbox onClick={closeLightbox}>
-          <LightboxContent onClick={e => e.stopPropagation()}>
-            <CloseButton onClick={closeLightbox}>
-              <X size={24} />
-            </CloseButton>
+      <AnimatePresence>
+        {selectedPhoto && selectedPhotoData && (
+          <Lightbox
+            onClick={closeLightbox}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div
+              onClick={e => e.stopPropagation()}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            >
+              <LightboxContent>
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <CloseButton onClick={closeLightbox}>
+                    <X size={24} />
+                  </CloseButton>
+                </motion.div>
 
-            <PrevButton onClick={goToPrevious}>
-              <ChevronLeft size={24} />
-            </PrevButton>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <PrevButton onClick={goToPrevious}>
+                    <ChevronLeft size={24} />
+                  </PrevButton>
+                </motion.div>
 
-            <LightboxImage
-              src={selectedPhotoData.src}
-              alt={selectedPhotoData.alt}
-            />
+                <motion.img
+                  key={selectedPhotoData.src}
+                  src={selectedPhotoData.src}
+                  alt={selectedPhotoData.alt}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain',
+                    borderRadius: '8px',
+                  }}
+                />
 
-            <NextButton onClick={goToNext}>
-              <ChevronRight size={24} />
-            </NextButton>
-          </LightboxContent>
-        </Lightbox>
-      )}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <NextButton onClick={goToNext}>
+                    <ChevronRight size={24} />
+                  </NextButton>
+                </motion.div>
+              </LightboxContent>
+            </motion.div>
+          </Lightbox>
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { motion } from 'motion/react';
 
 const CountdownContainer = styled.section`
   padding: ${props => props.theme.spacing.section}
@@ -11,7 +12,7 @@ const CountdownContainer = styled.section`
   overflow: hidden;
 `;
 
-const ContentWrapper = styled.div`
+const ContentWrapper = styled(motion.div)`
   max-width: 1000px;
   margin: 0 auto;
   display: grid;
@@ -142,7 +143,7 @@ const CountdownGrid = styled.div`
   }
 `;
 
-const TimeUnit = styled.div`
+const TimeUnit = styled(motion.div)`
   text-align: center;
   position: relative;
 `;
@@ -229,32 +230,97 @@ export function CountdownSection() {
 
   return (
     <CountdownContainer id="countdown">
-      <ContentWrapper>
-        <PhotoSection>
-          <HexagonFrame>
-            <HexagonImage />
-            <FloralDecoration $position="top-left" />
-            <FloralDecoration $position="top-right" />
-            <FloralDecoration $position="bottom-left" />
-            <FloralDecoration $position="bottom-right" />
-          </HexagonFrame>
-        </PhotoSection>
+      <ContentWrapper
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <PhotoSection>
+            <HexagonFrame>
+              <HexagonImage />
+              <FloralDecoration $position="top-left" />
+              <FloralDecoration $position="top-right" />
+              <FloralDecoration $position="bottom-left" />
+              <FloralDecoration $position="bottom-right" />
+            </HexagonFrame>
+          </PhotoSection>
+        </motion.div>
 
-        <CountdownContent>
-          <CoupleNames>Kaito & Timmy</CoupleNames>
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <CountdownContent>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
+              <CoupleNames>Kaito & Timmy</CoupleNames>
+            </motion.div>
 
-          <CountdownGrid>
-            {timeUnits.map((unit, index) => (
-              <TimeUnit key={unit.label}>
-                <TimeNumber>
-                  {unit.value.toString().padStart(2, '0')}
-                </TimeNumber>
-                <TimeLabel>{unit.label}</TimeLabel>
-                <DecorativeIcon $index={index} />
-              </TimeUnit>
-            ))}
-          </CountdownGrid>
-        </CountdownContent>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
+              <CountdownGrid>
+                {timeUnits.map((unit, index) => (
+                  <TimeUnit
+                    key={unit.label}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      duration: 0.5,
+                      delay: 1.0 + index * 0.1,
+                      type: 'spring',
+                      stiffness: 100,
+                    }}
+                    whileHover={{
+                      scale: 1.05,
+                      y: -5,
+                      transition: {
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 20,
+                      },
+                    }}
+                  >
+                    <motion.div
+                      key={unit.value}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 20,
+                        duration: 0.3,
+                      }}
+                    >
+                      <TimeNumber>
+                        {unit.value.toString().padStart(2, '0')}
+                      </TimeNumber>
+                    </motion.div>
+                    <TimeLabel>{unit.label}</TimeLabel>
+                    <DecorativeIcon $index={index} />
+                  </TimeUnit>
+                ))}
+              </CountdownGrid>
+            </motion.div>
+          </CountdownContent>
+        </motion.div>
       </ContentWrapper>
     </CountdownContainer>
   );

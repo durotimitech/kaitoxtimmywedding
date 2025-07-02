@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { motion } from 'motion/react';
 import { Copy, Check } from 'lucide-react';
 
-const BankContainer = styled.section`
+const BankContainer = styled(motion.section)`
   padding: ${props => props.theme.spacing.section}
     ${props => props.theme.spacing.lg};
   background: ${props => props.theme.colors.secondary};
@@ -29,7 +30,7 @@ const SectionSubtitle = styled.p`
   line-height: 1.6;
 `;
 
-const CurrencyGrid = styled.div`
+const CurrencyGrid = styled(motion.div)`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: ${props => props.theme.spacing.xl};
@@ -42,7 +43,7 @@ const CurrencyGrid = styled.div`
   }
 `;
 
-const CurrencyCard = styled.div`
+const CurrencyCard = styled(motion.div)`
   background: white;
   border-radius: ${props => props.theme.borderRadius.lg};
   padding: ${props => props.theme.spacing.xl};
@@ -186,40 +187,109 @@ export function BankDetailsSection() {
   };
 
   return (
-    <BankContainer id="gifts">
-      <SectionTitle>Gifts & Registry</SectionTitle>
-      <SectionSubtitle>
-        Your presence at our wedding is the greatest gift of all. However, if
-        you wish to honor us with a monetary gift, you can do so below!
-      </SectionSubtitle>
+    <BankContainer
+      id="gifts"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-100px' }}
+      transition={{ duration: 0.6 }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <SectionTitle>Gifts & Registry</SectionTitle>
+        <SectionSubtitle>
+          Your presence at our wedding is the greatest gift of all. However, if
+          you wish to honor us with a monetary gift, you can do so below!
+        </SectionSubtitle>
+      </motion.div>
 
-      <CurrencyGrid>
+      <CurrencyGrid
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+      >
         {bankAccounts.map((account, index) => (
-          <CurrencyCard key={index}>
-            <CurrencyHeader>
-              <CurrencyIcon>{account.currencyCode}</CurrencyIcon>
-              <CurrencyTitle>{account.currency}</CurrencyTitle>
-            </CurrencyHeader>
-
-            <BankDetail>
-              <DetailLabel>Account Name</DetailLabel>
-              <DetailValue>
-                <DetailText>{account.accountName}</DetailText>
-                <CopyButton
-                  $copied={copiedItem === `${index}-name`}
-                  onClick={() =>
-                    copyToClipboard(account.accountName, `${index}-name`)
-                  }
+          <CurrencyCard
+            key={index}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{
+              duration: 0.6,
+              delay: 0.6 + index * 0.2,
+              type: 'spring',
+              stiffness: 100,
+            }}
+            whileHover={{
+              y: -8,
+              scale: 1.02,
+              boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+              transition: { type: 'spring', stiffness: 300, damping: 20 },
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.8 + index * 0.2 }}
+            >
+              <CurrencyHeader>
+                <motion.div
+                  whileHover={{ scale: 1.1, rotate: 360 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                 >
-                  {copiedItem === `${index}-name` ? (
-                    <Check size={12} />
-                  ) : (
-                    <Copy size={12} />
-                  )}
-                  {copiedItem === `${index}-name` ? 'Copied' : 'Copy'}
-                </CopyButton>
-              </DetailValue>
-            </BankDetail>
+                  <CurrencyIcon>{account.currencyCode}</CurrencyIcon>
+                </motion.div>
+                <CurrencyTitle>{account.currency}</CurrencyTitle>
+              </CurrencyHeader>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 1.0 + index * 0.2 }}
+            >
+              <BankDetail>
+                <DetailLabel>Account Name</DetailLabel>
+                <DetailValue>
+                  <DetailText>{account.accountName}</DetailText>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                    style={{
+                      background:
+                        copiedItem === `${index}-name` ? '#10b981' : '#D4AF37',
+                      color: 'white',
+                      border: 'none',
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '0.8rem',
+                    }}
+                    onClick={() =>
+                      copyToClipboard(account.accountName, `${index}-name`)
+                    }
+                  >
+                    {copiedItem === `${index}-name` ? (
+                      <Check size={12} />
+                    ) : (
+                      <Copy size={12} />
+                    )}
+                    {copiedItem === `${index}-name` ? 'Copied' : 'Copy'}
+                  </motion.button>
+                </DetailValue>
+              </BankDetail>
+            </motion.div>
 
             {account.accountNumber && (
               <BankDetail>
@@ -315,25 +385,47 @@ export function BankDetailsSection() {
               </BankDetail>
             )}
 
-            <BankDetail>
-              <DetailLabel>Bank Name</DetailLabel>
-              <DetailValue>
-                <DetailText>{account.bankName}</DetailText>
-                <CopyButton
-                  $copied={copiedItem === `${index}-bank`}
-                  onClick={() =>
-                    copyToClipboard(account.bankName, `${index}-bank`)
-                  }
-                >
-                  {copiedItem === `${index}-bank` ? (
-                    <Check size={12} />
-                  ) : (
-                    <Copy size={12} />
-                  )}
-                  {copiedItem === `${index}-bank` ? 'Copied' : 'Copy'}
-                </CopyButton>
-              </DetailValue>
-            </BankDetail>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 1.4 + index * 0.2 }}
+            >
+              <BankDetail>
+                <DetailLabel>Bank Name</DetailLabel>
+                <DetailValue>
+                  <DetailText>{account.bankName}</DetailText>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                    style={{
+                      background:
+                        copiedItem === `${index}-bank` ? '#10b981' : '#D4AF37',
+                      color: 'white',
+                      border: 'none',
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '0.8rem',
+                    }}
+                    onClick={() =>
+                      copyToClipboard(account.bankName, `${index}-bank`)
+                    }
+                  >
+                    {copiedItem === `${index}-bank` ? (
+                      <Check size={12} />
+                    ) : (
+                      <Copy size={12} />
+                    )}
+                    {copiedItem === `${index}-bank` ? 'Copied' : 'Copy'}
+                  </motion.button>
+                </DetailValue>
+              </BankDetail>
+            </motion.div>
           </CurrencyCard>
         ))}
       </CurrencyGrid>

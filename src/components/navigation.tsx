@@ -1,9 +1,10 @@
 'use client';
 
 import styled from 'styled-components';
+import { motion } from 'motion/react';
 import { Heart } from 'lucide-react';
 
-const NavContainer = styled.nav`
+const NavContainer = styled(motion.nav)`
   position: fixed;
   top: 0;
   left: 0;
@@ -29,7 +30,7 @@ const NavContent = styled.div`
   }
 `;
 
-const LeftNavLinks = styled.div`
+const LeftNavLinks = styled(motion.div)`
   display: flex;
   align-items: center;
   gap: ${props => props.theme.spacing.xl};
@@ -39,7 +40,7 @@ const LeftNavLinks = styled.div`
   }
 `;
 
-const RightNavLinks = styled.div`
+const RightNavLinks = styled(motion.div)`
   display: flex;
   align-items: center;
   gap: ${props => props.theme.spacing.xl};
@@ -49,18 +50,13 @@ const RightNavLinks = styled.div`
   }
 `;
 
-const NavLink = styled.a`
+const NavLink = styled(motion.a)`
   color: ${props => props.theme.colors.text};
   text-decoration: none;
   font-weight: 400;
   font-size: 0.95rem;
-  transition: color 0.2s;
   cursor: pointer;
   outline: none;
-
-  &:hover {
-    color: ${props => props.theme.colors.primary};
-  }
 
   &:focus {
     outline: none;
@@ -71,7 +67,7 @@ const NavLink = styled.a`
   }
 `;
 
-const Logo = styled.div`
+const Logo = styled(motion.div)`
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -100,7 +96,7 @@ const LogoIcon = styled.div`
   color: white;
 `;
 
-const MobileMenuButton = styled.button`
+const MobileMenuButton = styled(motion.button)`
   display: none;
   flex-direction: column;
   gap: 4px;
@@ -144,25 +140,87 @@ const smoothScrollTo = (elementId: string) => {
 
 export function Navigation() {
   return (
-    <NavContainer>
+    <NavContainer
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+    >
       <NavContent>
-        <LeftNavLinks>
-          <NavLink onClick={() => smoothScrollTo('hero')}>Home</NavLink>
-          <NavLink onClick={() => smoothScrollTo('about')}>About</NavLink>
+        <LeftNavLinks
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <NavLink
+            onClick={() => smoothScrollTo('hero')}
+            whileHover={{
+              color: '#D4AF37',
+              scale: 1.05,
+              transition: { type: 'spring', stiffness: 400, damping: 17 },
+            }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Home
+          </NavLink>
+          <NavLink
+            onClick={() => smoothScrollTo('about')}
+            whileHover={{
+              color: '#D4AF37',
+              scale: 1.05,
+              transition: { type: 'spring', stiffness: 400, damping: 17 },
+            }}
+            whileTap={{ scale: 0.95 }}
+          >
+            About
+          </NavLink>
         </LeftNavLinks>
 
-        <Logo>
-          <LogoIcon>
-            <Heart size={20} />
-          </LogoIcon>
+        <Logo
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          whileHover={{
+            scale: 1.05,
+            transition: { type: 'spring', stiffness: 400, damping: 17 },
+          }}
+        >
+          <motion.div
+            whileHover={{
+              rotate: 360,
+              scale: 1.1,
+              transition: { duration: 0.5 },
+            }}
+          >
+            <LogoIcon>
+              <Heart size={20} />
+            </LogoIcon>
+          </motion.div>
           Kaito x Timmy
         </Logo>
 
-        <RightNavLinks>
-          <NavLink onClick={() => smoothScrollTo('gallery')}>Photobook</NavLink>
+        <RightNavLinks
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <NavLink
+            onClick={() => smoothScrollTo('gallery')}
+            whileHover={{
+              color: '#D4AF37',
+              scale: 1.05,
+              transition: { type: 'spring', stiffness: 400, damping: 17 },
+            }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Photobook
+          </NavLink>
         </RightNavLinks>
 
-        <MobileMenuButton>
+        <MobileMenuButton
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
           <MenuLine />
           <MenuLine />
           <MenuLine />

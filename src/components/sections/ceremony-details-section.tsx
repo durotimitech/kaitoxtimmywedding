@@ -1,9 +1,10 @@
 'use client';
 
 import styled from 'styled-components';
+import { motion } from 'motion/react';
 import { MapPin, Clock, Calendar, Shirt } from 'lucide-react';
 
-const CeremonyContainer = styled.section`
+const CeremonyContainer = styled(motion.section)`
   padding: ${props => props.theme.spacing.section}
     ${props => props.theme.spacing.lg};
   background: ${props => props.theme.colors.background};
@@ -17,7 +18,7 @@ const SectionTitle = styled.h2`
   margin-bottom: ${props => props.theme.spacing.lg};
 `;
 
-const DetailsContainer = styled.div`
+const DetailsContainer = styled(motion.div)`
   max-width: 600px;
   margin: 0 auto;
   display: flex;
@@ -25,7 +26,7 @@ const DetailsContainer = styled.div`
   align-items: center;
 `;
 
-const InfoCard = styled.div`
+const InfoCard = styled(motion.div)`
   background: white;
   border-radius: ${props => props.theme.borderRadius.lg};
   padding: ${props => props.theme.spacing.xl};
@@ -33,7 +34,7 @@ const InfoCard = styled.div`
   border: 1px solid ${props => props.theme.colors.border};
 `;
 
-const InfoSection = styled.div`
+const InfoSection = styled(motion.div)`
   margin-bottom: ${props => props.theme.spacing.xl};
 
   &:last-child {
@@ -77,62 +78,115 @@ const EventTitle = styled.h3`
 // Removed unused map components: MapContainer, MapPlaceholder, MapFrame
 
 export function CeremonyDetailsSection() {
+  const infoSections = [
+    {
+      icon: Calendar,
+      title: 'Date',
+      content: 'Monday, September 8, 2025',
+    },
+    {
+      icon: Clock,
+      title: 'Time',
+      content: '14:00 PM',
+    },
+    {
+      icon: MapPin,
+      title: 'Location',
+      content: (
+        <>
+          <strong>The Strand Hotel</strong>
+          <br />
+          Limerick City
+          <br />
+          Limerick, Ireland
+          <br />
+        </>
+      ),
+    },
+    {
+      icon: Shirt,
+      title: 'Dress Code',
+      content: <em>Blush Pink & Navy Blue</em>,
+    },
+  ];
+
   return (
-    <CeremonyContainer id="ceremony">
-      <SectionTitle>Ceremony Details</SectionTitle>
+    <CeremonyContainer
+      id="ceremony"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-100px' }}
+      transition={{ duration: 0.6 }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <SectionTitle>Ceremony Details</SectionTitle>
+      </motion.div>
 
-      <DetailsContainer>
-        <InfoCard>
-          <EventTitle>The Ceremony</EventTitle>
+      <DetailsContainer
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+      >
+        <InfoCard
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          whileHover={{
+            y: -5,
+            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+            transition: { type: 'spring', stiffness: 300, damping: 20 },
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+          >
+            <EventTitle>The Ceremony</EventTitle>
+          </motion.div>
 
-          <InfoSection>
-            <InfoHeader>
-              <InfoIcon>
-                <Calendar size={20} />
-              </InfoIcon>
-              <InfoTitle>Date</InfoTitle>
-            </InfoHeader>
-            <InfoContent>Monday, September 8, 2025</InfoContent>
-          </InfoSection>
-
-          <InfoSection>
-            <InfoHeader>
-              <InfoIcon>
-                <Clock size={20} />
-              </InfoIcon>
-              <InfoTitle>Time</InfoTitle>
-            </InfoHeader>
-            <InfoContent>14:00 PM</InfoContent>
-          </InfoSection>
-
-          <InfoSection>
-            <InfoHeader>
-              <InfoIcon>
-                <MapPin size={20} />
-              </InfoIcon>
-              <InfoTitle>Location</InfoTitle>
-            </InfoHeader>
-            <InfoContent>
-              <strong>The Strand Hotel</strong>
-              <br />
-              Limerick City
-              <br />
-              Limerick, Ireland
-              <br />
-            </InfoContent>
-          </InfoSection>
-
-          <InfoSection>
-            <InfoHeader>
-              <InfoIcon>
-                <Shirt size={20} />
-              </InfoIcon>
-              <InfoTitle>Dress Code</InfoTitle>
-            </InfoHeader>
-            <InfoContent>
-              <em>Blush Pink & Navy Blue</em>
-            </InfoContent>
-          </InfoSection>
+          {infoSections.map((section, index) => {
+            const IconComponent = section.icon;
+            return (
+              <InfoSection
+                key={section.title}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.5,
+                  delay: 1.0 + index * 0.1,
+                  type: 'spring',
+                  stiffness: 100,
+                }}
+                whileHover={{
+                  x: 5,
+                  transition: { type: 'spring', stiffness: 300, damping: 20 },
+                }}
+              >
+                <InfoHeader>
+                  <motion.div
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                  >
+                    <InfoIcon>
+                      <IconComponent size={20} />
+                    </InfoIcon>
+                  </motion.div>
+                  <InfoTitle>{section.title}</InfoTitle>
+                </InfoHeader>
+                <InfoContent>{section.content}</InfoContent>
+              </InfoSection>
+            );
+          })}
         </InfoCard>
       </DetailsContainer>
     </CeremonyContainer>

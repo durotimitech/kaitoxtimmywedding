@@ -1,6 +1,7 @@
 'use client';
 
 import styled from 'styled-components';
+import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,7 @@ const AboutContainer = styled.section`
   overflow: hidden;
 `;
 
-const ContentWrapper = styled.div`
+const ContentWrapper = styled(motion.div)`
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
@@ -29,7 +30,7 @@ const ContentWrapper = styled.div`
   }
 `;
 
-const TextContent = styled.div`
+const TextContent = styled(motion.div)`
   position: relative;
   z-index: 2;
 `;
@@ -150,7 +151,7 @@ const ProgressFill = styled.div<{ $progress: number }>`
   border-radius: 2px;
 `;
 
-const ImageSection = styled.div`
+const ImageSection = styled(motion.div)`
   position: relative;
   height: 500px;
 
@@ -340,39 +341,82 @@ export function AboutSection() {
     <>
       <AboutContainer id="about">
         <BackgroundDecoration />
-        <ContentWrapper>
-          <TextContent>
-            <ToggleContainer>
-              <ToggleButton
-                $isActive={activeMessage === 'groom'}
-                onClick={() => handleToggle('groom')}
-              >
-                Groom&apos;s Message
-              </ToggleButton>
-              <ToggleButton
-                $isActive={activeMessage === 'bride'}
-                onClick={() => handleToggle('bride')}
-              >
-                Bride&apos;s Message
-              </ToggleButton>
-            </ToggleContainer>
+        <ContentWrapper
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
+          <TextContent
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <ToggleContainer>
+                <ToggleButton
+                  $isActive={activeMessage === 'groom'}
+                  onClick={() => handleToggle('groom')}
+                >
+                  Groom&apos;s Message
+                </ToggleButton>
+                <ToggleButton
+                  $isActive={activeMessage === 'bride'}
+                  onClick={() => handleToggle('bride')}
+                >
+                  Bride&apos;s Message
+                </ToggleButton>
+              </ToggleContainer>
+            </motion.div>
 
-            <ProgressBar>
-              <ProgressFill $progress={progress} />
-            </ProgressBar>
+            <motion.div
+              initial={{ opacity: 0, scaleX: 0 }}
+              whileInView={{ opacity: 1, scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <ProgressBar>
+                <ProgressFill $progress={progress} />
+              </ProgressBar>
+            </motion.div>
 
-            <MessageContainer $isVisible={true}>
-              <SectionTitle>{currentMessage.title}</SectionTitle>
-              <MessageText>{truncateText(currentMessage.text)}</MessageText>
-              <ViewMoreButton onClick={handleViewMore}>
-                View More
-              </ViewMoreButton>
-              <Signature>{currentMessage.signature}</Signature>
-            </MessageContainer>
+            <motion.div
+              key={activeMessage}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <MessageContainer $isVisible={true}>
+                <SectionTitle>{currentMessage.title}</SectionTitle>
+                <MessageText>{truncateText(currentMessage.text)}</MessageText>
+                <ViewMoreButton onClick={handleViewMore}>
+                  View More
+                </ViewMoreButton>
+                <Signature>{currentMessage.signature}</Signature>
+              </MessageContainer>
+            </motion.div>
           </TextContent>
 
-          <ImageSection>
-            <MainImage $imageUrl={currentMessage.image} />
+          <ImageSection
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <motion.div
+              key={currentMessage.image}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <MainImage $imageUrl={currentMessage.image} />
+            </motion.div>
             <FloralDecorationLarge />
             <FloralDecorationSmall />
           </ImageSection>

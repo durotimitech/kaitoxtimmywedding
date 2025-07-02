@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Send, X } from 'lucide-react';
 import { getMessages, addMessage } from '@/lib/messages';
@@ -16,7 +17,7 @@ const slideDown = keyframes`
   }
 `;
 
-const GuestbookContainer = styled.section`
+const GuestbookContainer = styled(motion.section)`
   padding: ${props => props.theme.spacing.section}
     ${props => props.theme.spacing.lg};
   background: ${props => props.theme.colors.background};
@@ -41,7 +42,7 @@ const SectionSubtitle = styled.p`
   line-height: 1.6;
 `;
 
-const ContentContainer = styled.div`
+const ContentContainer = styled(motion.div)`
   max-width: 800px;
   margin: 0 auto;
   display: flex;
@@ -203,61 +204,6 @@ const ErrorMessage = styled.div`
   margin: ${props => props.theme.spacing.lg} 0;
 `;
 
-// Modal Styles
-const ModalOverlay = styled.div<{ $isOpen: boolean }>`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: ${props => (props.$isOpen ? 'flex' : 'none')};
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 16px;
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 32px;
-  max-width: 500px;
-  width: 100%;
-  position: relative;
-  box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-`;
-
-const CloseButton = styled.button`
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
-  outline: none;
-
-  &:hover {
-    background: #f3f4f6;
-  }
-
-  &:focus {
-    outline: none;
-  }
-
-  &:active {
-    outline: none;
-  }
-`;
-
 const ModalTitle = styled.h2`
   font-size: 24px;
   font-weight: 600;
@@ -406,96 +352,269 @@ export function GuestbookSection({
     messages.length > 0 ? [...messages, ...messages] : [];
 
   return (
-    <GuestbookContainer id="messages">
-      <SectionTitle>Kind Messages</SectionTitle>
-      <SectionSubtitle>
-        Leave us a message! We&apos;d love to hear your thoughts, wishes, and
-        advice as we begin this new chapter together.
-      </SectionSubtitle>
+    <GuestbookContainer
+      id="messages"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-100px' }}
+      transition={{ duration: 0.6 }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <SectionTitle>Kind Messages</SectionTitle>
+        <SectionSubtitle>
+          Leave us a message! We&apos;d love to hear your thoughts, wishes, and
+          advice as we begin this new chapter together.
+        </SectionSubtitle>
+      </motion.div>
 
-      <ContentContainer>
-        <SendMessageButton onClick={onOpenModal}>
-          <MessageCircle size={20} />
-          Send Message
-        </SendMessageButton>
+      <ContentContainer
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
+          <SendMessageButton onClick={onOpenModal}>
+            <MessageCircle size={20} />
+            Send Message
+          </SendMessageButton>
+        </motion.div>
 
-        <MessagesTitle>
-          <Heart size={20} />
-        </MessagesTitle>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+          whileHover={{
+            scale: 1.1,
+            transition: { type: 'spring', stiffness: 400, damping: 17 },
+          }}
+        >
+          <MessagesTitle>
+            <Heart size={20} />
+          </MessagesTitle>
+        </motion.div>
 
-        <MessagesContainer>
-          {isLoading ? (
-            <LoadingMessage>Loading messages...</LoadingMessage>
-          ) : error ? (
-            <ErrorMessage>{error}</ErrorMessage>
-          ) : messages.length === 0 ? (
-            <LoadingMessage>
-              No messages yet. Be the first to leave a message!
-            </LoadingMessage>
-          ) : (
-            <AnimatedMessagesWrapper>
-              {duplicatedMessages.map((message, index) => (
-                <MessageCard key={`${message.id}-${index}`}>
-                  <MessageText>{message.message}</MessageText>
-                  <MessageDate>
-                    {formatDate(message.created_at || '')}
-                  </MessageDate>
-                </MessageCard>
-              ))}
-            </AnimatedMessagesWrapper>
-          )}
-        </MessagesContainer>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 1.0 }}
+        >
+          <MessagesContainer>
+            {isLoading ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <LoadingMessage>Loading messages...</LoadingMessage>
+              </motion.div>
+            ) : error ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <ErrorMessage>{error}</ErrorMessage>
+              </motion.div>
+            ) : messages.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <LoadingMessage>
+                  No messages yet. Be the first to leave a message!
+                </LoadingMessage>
+              </motion.div>
+            ) : (
+              <AnimatedMessagesWrapper>
+                {duplicatedMessages.map((message, index) => (
+                  <motion.div
+                    key={`${message.id}-${index}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.5,
+                      delay: index * 0.1,
+                      type: 'spring',
+                      stiffness: 100,
+                    }}
+                    whileHover={{
+                      scale: 1.02,
+                      transition: {
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 20,
+                      },
+                    }}
+                  >
+                    <MessageCard>
+                      <MessageText>{message.message}</MessageText>
+                      <MessageDate>
+                        {formatDate(message.created_at || '')}
+                      </MessageDate>
+                    </MessageCard>
+                  </motion.div>
+                ))}
+              </AnimatedMessagesWrapper>
+            )}
+          </MessagesContainer>
+        </motion.div>
       </ContentContainer>
 
       {/* Message Modal */}
-      <ModalOverlay
-        $isOpen={isModalOpen}
-        onClick={e => {
-          if (e.target === e.currentTarget) {
-            handleModalClose();
-          }
-        }}
-      >
-        <ModalContent>
-          <CloseButton onClick={handleModalClose}>
-            <X size={20} />
-          </CloseButton>
-          <ModalTitle>Share Your Message</ModalTitle>
-          <ModalMessage>
-            Send us your thoughts, wishes, or advice as we begin this new
-            chapter together.
-          </ModalMessage>
-
-          {showSuccess && (
-            <SuccessMessage>
-              <Heart size={16} />
-              Thank you for your beautiful message! It means the world to us.
-            </SuccessMessage>
-          )}
-
-          {error && <ErrorMessage>{error}</ErrorMessage>}
-
-          <form onSubmit={handleSubmit}>
-            <TextArea
-              value={messageText}
-              onChange={e => setMessageText(e.target.value)}
-              placeholder="Share your thoughts, wishes, or advice for the happy couple..."
-              required
-              disabled={isSubmitting}
-            />
-
-            <SendMessageButton
-              type="submit"
-              disabled={isSubmitting || !messageText.trim()}
-              className="w-full bg-[#8B7355] hover:bg-[#7A6348] text-white py-3 text-lg"
-              style={{ outline: 'none' }}
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999,
+              padding: '16px',
+            }}
+            onClick={e => {
+              if (e.target === e.currentTarget) {
+                handleModalClose();
+              }
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              style={{
+                background: 'white',
+                borderRadius: '12px',
+                padding: '32px',
+                maxWidth: '500px',
+                width: '100%',
+                position: 'relative',
+                boxShadow:
+                  '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              }}
             >
-              <Send size={18} className="mr-2" />
-              {isSubmitting ? 'Sending...' : 'Send Message'}
-            </SendMessageButton>
-          </form>
-        </ModalContent>
-      </ModalOverlay>
+              <motion.button
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                onClick={handleModalClose}
+                style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '8px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <X size={20} />
+              </motion.button>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <ModalTitle>Share Your Message</ModalTitle>
+                <ModalMessage>
+                  Send us your thoughts, wishes, or advice as we begin this new
+                  chapter together.
+                </ModalMessage>
+              </motion.div>
+
+              <AnimatePresence mode="wait">
+                {showSuccess && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                  >
+                    <SuccessMessage>
+                      <Heart size={16} />
+                      Thank you for your beautiful message! It means the world
+                      to us.
+                    </SuccessMessage>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <AnimatePresence mode="wait">
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                  >
+                    <ErrorMessage>{error}</ErrorMessage>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <motion.form
+                onSubmit={handleSubmit}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <TextArea
+                  value={messageText}
+                  onChange={e => setMessageText(e.target.value)}
+                  placeholder="Share your thoughts, wishes, or advice for the happy couple..."
+                  required
+                  disabled={isSubmitting}
+                />
+
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                >
+                  <SendMessageButton
+                    type="submit"
+                    disabled={isSubmitting || !messageText.trim()}
+                    className="w-full bg-[#8B7355] hover:bg-[#7A6348] text-white py-3 text-lg"
+                    style={{ outline: 'none' }}
+                  >
+                    <Send size={18} className="mr-2" />
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
+                  </SendMessageButton>
+                </motion.div>
+              </motion.form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </GuestbookContainer>
   );
 }

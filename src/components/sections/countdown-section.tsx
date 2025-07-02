@@ -199,7 +199,7 @@ export function CountdownSection() {
   });
 
   useEffect(() => {
-    const targetDate = new Date('2025-08-06T12:00:00').getTime();
+    const targetDate = new Date('2025-09-08T12:00:00').getTime();
 
     const timer = setInterval(() => {
       const now = new Date().getTime();

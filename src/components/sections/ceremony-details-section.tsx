@@ -2,7 +2,7 @@
 
 import styled from 'styled-components';
 import { motion } from 'motion/react';
-import { MapPin, Clock, Calendar, Shirt } from 'lucide-react';
+import { MapPin, Clock, Calendar, Shirt, ExternalLink } from 'lucide-react';
 
 const CeremonyContainer = styled(motion.section)`
   padding: ${props => props.theme.spacing.section}
@@ -75,6 +75,31 @@ const EventTitle = styled.h3`
   text-align: center;
 `;
 
+const MapLink = styled(motion.a)`
+  display: inline-flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing.xs};
+  margin-top: ${props => props.theme.spacing.sm};
+  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.md};
+  background: ${props => props.theme.colors.primary};
+  color: white;
+  text-decoration: none;
+  border-radius: ${props => props.theme.borderRadius.md};
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #7a6348;
+    transform: translateY(-1px);
+    box-shadow: ${props => props.theme.shadows.md};
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
 // Removed unused map components: MapContainer, MapPlaceholder, MapFrame
 
 export function CeremonyDetailsSection() {
@@ -100,6 +125,18 @@ export function CeremonyDetailsSection() {
           <br />
           Limerick, Ireland
           <br />
+          <MapLink
+            href="https://maps.google.com/?q=The+Strand+Hotel,+Limerick+City,+Ireland"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+          >
+            <MapPin size={16} />
+            View on Google Maps
+            <ExternalLink size={14} />
+          </MapLink>
         </>
       ),
     },

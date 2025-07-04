@@ -2,8 +2,9 @@
 
 import styled from 'styled-components';
 import { motion } from 'motion/react';
-import { ReservationModal } from '@/components/ui/modal';
+
 import { useState } from 'react';
+import { ReservationModal } from '../ui/modal';
 
 const HeroContainer = styled.section`
   padding: 120px ${props => props.theme.spacing.lg}

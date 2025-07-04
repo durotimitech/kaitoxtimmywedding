@@ -173,6 +173,17 @@ export function Navigation() {
           >
             About
           </NavLink>
+          <NavLink
+            onClick={() => smoothScrollTo('travel')}
+            whileHover={{
+              color: '#D4AF37',
+              scale: 1.05,
+              transition: { type: 'spring', stiffness: 400, damping: 17 },
+            }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Travel
+          </NavLink>
         </LeftNavLinks>
 
         <Logo
@@ -203,6 +214,17 @@ export function Navigation() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
+          <NavLink
+            onClick={() => smoothScrollTo('faq')}
+            whileHover={{
+              color: '#D4AF37',
+              scale: 1.05,
+              transition: { type: 'spring', stiffness: 400, damping: 17 },
+            }}
+            whileTap={{ scale: 0.95 }}
+          >
+            FAQ
+          </NavLink>
           <NavLink
             onClick={() => smoothScrollTo('gallery')}
             whileHover={{

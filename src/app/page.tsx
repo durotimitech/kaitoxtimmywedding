@@ -8,9 +8,13 @@ import { AboutSection } from '@/components/sections/about-section';
 import { ProposalVideoSection } from '@/components/sections/proposal-video-section';
 import { PhotoGallerySection } from '@/components/sections/photo-gallery-section';
 import { CeremonyDetailsSection } from '@/components/sections/ceremony-details-section';
+import { TravelAccommodationSection } from '@/components/sections/travel-accommodation-section';
+import { FAQSection } from '@/components/sections/faq-section';
 import { BankDetailsSection } from '@/components/sections/bank-details-section';
 import { GuestbookSection } from '@/components/sections/guestbook-section';
 import { FloatingNavigation } from '@/components/floating-navigation';
+import { AuthProvider } from '@/contexts/auth-context';
+import { ProtectedSection } from '@/components/ui/protected-section';
 
 export default function Home() {
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -19,7 +23,7 @@ export default function Home() {
   const closeMessageModal = () => setIsMessageModalOpen(false);
 
   return (
-    <>
+    <AuthProvider>
       <Navigation />
       <main>
         <HeroSection />
@@ -27,7 +31,13 @@ export default function Home() {
         <AboutSection />
         <ProposalVideoSection />
         <PhotoGallerySection />
-        <CeremonyDetailsSection />
+        <ProtectedSection sectionType="ceremony">
+          <CeremonyDetailsSection />
+        </ProtectedSection>
+        <ProtectedSection sectionType="travel">
+          <TravelAccommodationSection />
+        </ProtectedSection>
+        <FAQSection />
         <BankDetailsSection />
         <GuestbookSection
           isModalOpen={isMessageModalOpen}
@@ -36,6 +46,6 @@ export default function Home() {
         />
       </main>
       <FloatingNavigation onSendMessage={openMessageModal} />
-    </>
+    </AuthProvider>
   );
 }

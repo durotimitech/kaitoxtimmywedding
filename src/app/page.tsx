@@ -10,6 +10,7 @@ import { PhotoGallerySection } from '@/components/sections/photo-gallery-section
 import { CeremonyDetailsSection } from '@/components/sections/ceremony-details-section';
 import { TravelAccommodationSection } from '@/components/sections/travel-accommodation-section';
 import { FAQSection } from '@/components/sections/faq-section';
+import { SongRequestSection } from '@/components/sections/song-request-section';
 import { BankDetailsSection } from '@/components/sections/bank-details-section';
 import { GuestbookSection } from '@/components/sections/guestbook-section';
 import { FloatingNavigation } from '@/components/floating-navigation';
@@ -38,6 +39,9 @@ export default function Home() {
           <TravelAccommodationSection />
         </ProtectedSection>
         <FAQSection />
+        <ProtectedSection sectionType="songs">
+          <SongRequestSection />
+        </ProtectedSection>
         <BankDetailsSection />
         <GuestbookSection
           isModalOpen={isMessageModalOpen}

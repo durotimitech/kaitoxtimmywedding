@@ -57,7 +57,7 @@ const VerifyButton = styled(Button)`
   }
 `;
 
-export type SectionType = 'ceremony' | 'travel' | 'default';
+export type SectionType = 'ceremony' | 'travel' | 'songs' | 'default';
 
 interface LoadingFallbackProps {
   onVerifyClick: () => void;
@@ -77,6 +77,12 @@ const getSectionContent = (sectionType: SectionType) => {
         title: 'Travel & Accommodation',
         message:
           'Access detailed travel information including the best airports to fly into Ireland, transportation options, and recommended hotels.',
+      };
+    case 'songs':
+      return {
+        title: 'Song Requests',
+        message:
+          'Request songs for our wedding celebration and see what others have requested.',
       };
     default:
       return {

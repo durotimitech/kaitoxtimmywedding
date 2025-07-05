@@ -226,6 +226,17 @@ export function Navigation() {
             FAQ
           </NavLink>
           <NavLink
+            onClick={() => smoothScrollTo('song-requests')}
+            whileHover={{
+              color: '#D4AF37',
+              scale: 1.05,
+              transition: { type: 'spring', stiffness: 400, damping: 17 },
+            }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Songs
+          </NavLink>
+          <NavLink
             onClick={() => smoothScrollTo('gallery')}
             whileHover={{
               color: '#D4AF37',

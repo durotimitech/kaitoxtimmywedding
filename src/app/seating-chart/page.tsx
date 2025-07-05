@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { getSeatingChart } from '@/lib/rsvp';
 import { RSVP } from '@/lib/supabase';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Search } from 'lucide-react';
 
 interface SeatingChartData {
   [tableNumber: number]: RSVP[];
@@ -53,15 +54,21 @@ export default function SeatingChartPage() {
     }
   }
 
-  const displayChart = search.trim() === '' ? seatingChart : filteredChart;
+  // If no search results, show all RSVPs
+  const displayChart =
+    search.trim() === '' || Object.keys(filteredChart).length > 0
+      ? search.trim() === ''
+        ? seatingChart
+        : filteredChart
+      : seatingChart;
   const displayTableNumbers = Object.keys(displayChart)
     .map(Number)
     .sort((a, b) => a - b);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-xl">
           <CardContent className="pt-6">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mx-auto mb-4"></div>
@@ -75,8 +82,8 @@ export default function SeatingChartPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-xl">
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-red-600 mb-4">{error}</p>
@@ -95,8 +102,8 @@ export default function SeatingChartPage() {
 
   if (displayTableNumbers.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-xl">
           <CardContent className="pt-6">
             <div className="text-center">
               <h2 className="text-2xl font-semibold text-gray-800 mb-2">
@@ -115,71 +122,83 @@ export default function SeatingChartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 p-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200 p-4 font-sans">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-10">
+          <h1
+            className="text-5xl font-extrabold text-gray-800 mb-2 tracking-tight"
+            style={{ fontFamily: 'Playfair Display, serif' }}
+          >
             Seating Chart
           </h1>
-          <p className="text-gray-600 mb-4">
+          <p className="text-lg text-gray-500 mb-6">
             Find your assigned table and seat
           </p>
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search your name..."
-            className="w-full max-w-md px-4 py-2 border border-rose-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-400 text-lg shadow-sm"
-          />
+          <div className="flex justify-center">
+            <div className="relative w-full max-w-md">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <Search size={20} />
+              </span>
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search your name..."
+                className="w-full pl-10 pr-4 py-2 border border-rose-200 rounded-full focus:outline-none focus:ring-2 focus:ring-rose-400 text-lg shadow-sm bg-white/80 transition"
+                style={{ fontFamily: 'inherit' }}
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {displayTableNumbers.map(tableNumber => (
-            <Card
+            <div
               key={tableNumber}
-              className="bg-white/80 backdrop-blur-sm border-rose-200"
+              className="rounded-3xl shadow-xl bg-white/90 border border-rose-100 p-6 flex flex-col items-stretch transition hover:shadow-2xl"
             >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-2xl font-bold text-rose-600 text-center">
+              <div className="mb-6">
+                <h2
+                  className="text-3xl font-bold text-rose-600 text-center tracking-tight mb-1"
+                  style={{ fontFamily: 'Playfair Display, serif' }}
+                >
                   Table {tableNumber}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {displayChart[tableNumber].map(rsvp => (
-                    <div
-                      key={rsvp.id}
-                      className="flex justify-between items-center p-3 bg-rose-50 rounded-lg border border-rose-100"
-                    >
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-800">
-                          {rsvp.first_name} {rsvp.last_name}
-                        </p>
-                        {rsvp.email && (
-                          <p className="text-sm text-gray-600">{rsvp.email}</p>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <span className="inline-flex items-center justify-center w-8 h-8 bg-rose-500 text-white text-sm font-bold rounded-full">
-                          {rsvp.seat}
-                        </span>
-                      </div>
+                </h2>
+              </div>
+              <div className="flex-1 space-y-4">
+                {displayChart[tableNumber].map(rsvp => (
+                  <div
+                    key={rsvp.id}
+                    className="flex justify-between items-center p-4 bg-rose-50 rounded-2xl border border-rose-100 shadow-sm hover:bg-rose-100 transition group"
+                  >
+                    <div className="flex-1">
+                      <p
+                        className="font-semibold text-gray-800 text-lg group-hover:text-rose-600 transition"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {rsvp.first_name} {rsvp.last_name}
+                      </p>
                     </div>
-                  ))}
-                </div>
-                <div className="mt-4 pt-3 border-t border-rose-200">
-                  <p className="text-sm text-gray-600 text-center">
-                    {displayChart[tableNumber].length} guest
-                    {displayChart[tableNumber].length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                    <div className="text-right">
+                      <span className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-rose-500 to-pink-400 text-white text-lg font-bold rounded-full shadow-md border-2 border-white">
+                        {rsvp.seat}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 pt-4 border-t border-rose-100">
+                <p className="text-base text-gray-500 text-center">
+                  {displayChart[tableNumber].length} guest
+                  {displayChart[tableNumber].length !== 1 ? 's' : ''}
+                </p>
+              </div>
+            </div>
           ))}
         </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-gray-600">
+        <div className="mt-12 text-center">
+          <p className="text-lg text-gray-600 font-medium">
             Total guests with seating assignments:{' '}
             {Object.values(displayChart).flat().length}
           </p>

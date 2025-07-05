@@ -1,54 +1,54 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { RSVP } from '@/lib/supabase';
-import { getRSVPs, updateRSVPSeating } from '@/lib/rsvp';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { getSeatingChart, getRSVPs, updateRSVPSeating } from '@/lib/rsvp';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from '@hello-pangea/dnd';
 
-interface EditState {
-  table: string;
-  seat: string;
-  saving: boolean;
+interface SeatingColumns {
+  [tableNumber: string]: RSVP[];
 }
 
+const TABLE_COUNT = 10;
+const UNASSIGNED = 'unassigned';
+
 export default function AdminSeatingPage() {
-  const [rsvps, setRsvps] = useState<RSVP[]>([]);
+  const [columns, setColumns] = useState<SeatingColumns>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [editStates, setEditStates] = useState<Record<number, EditState>>({});
-  const isMounted = useRef(true);
-  const editStatesRef = useRef(editStates);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
-    isMounted.current = true;
     const stored = localStorage.getItem('wedding_auth_user');
     setIsAuthenticated(!!stored);
-    fetchRSVPs();
-    editStatesRef.current = editStates;
-    return () => {
-      isMounted.current = false;
-    };
-    // eslint-disable-next-line
+    fetchSeatingColumns();
   }, []);
 
-  async function fetchRSVPs() {
+  async function fetchSeatingColumns() {
     try {
       setLoading(true);
-      const data = await getRSVPs();
-      setRsvps(data);
-      // Initialize edit states
-      const initialEditStates: Record<number, EditState> = {};
-      data.forEach(rsvp => {
-        initialEditStates[rsvp.id] = {
-          table: rsvp.table?.toString() || '',
-          seat: rsvp.seat?.toString() || '',
-          saving: false,
-        };
-      });
-      setEditStates(initialEditStates);
+      const [allRSVPs, seatingChart] = await Promise.all([
+        getRSVPs(),
+        getSeatingChart(),
+      ]);
+      // Fill in assigned tables
+      const newColumns: SeatingColumns = {};
+      for (let i = 1; i <= TABLE_COUNT; ++i)
+        newColumns[i] = seatingChart[i] || [];
+      // Find unassigned RSVPs (no table or seat)
+      const assignedIds = Object.values(seatingChart)
+        .flat()
+        .map(r => r.id);
+      newColumns[UNASSIGNED] = allRSVPs.filter(
+        rsvp => !assignedIds.includes(rsvp.id)
+      );
+      setColumns(newColumns);
     } catch (err) {
       setError('Failed to load RSVPs');
       console.error('Error fetching RSVPs:', err);
@@ -57,59 +57,60 @@ export default function AdminSeatingPage() {
     }
   }
 
-  function handleInputChange(
-    rsvpId: number,
-    field: 'table' | 'seat',
-    value: string
-  ) {
-    setEditStates(prev => {
-      const prevState = prev[rsvpId] || { table: '', seat: '', saving: false };
-      return {
-        ...prev,
-        [rsvpId]: { ...prevState, [field]: value },
-      };
-    });
-  }
-
-  async function handleSave(rsvpId: number) {
-    setEditStates(prev => ({
-      ...prev,
-      [rsvpId]: { ...prev[rsvpId], saving: true },
-    }));
-    const { table = '', seat = '' } = editStates[rsvpId] || {};
-    const tableNum = parseInt(table);
-    const seatNum = parseInt(seat);
-    if (isNaN(tableNum) || isNaN(seatNum)) {
-      setEditStates(prev => ({
-        ...prev,
-        [rsvpId]: { ...prev[rsvpId], saving: false },
-      }));
-      alert('Invalid table or seat number');
+  const onDragEnd = async (result: DropResult) => {
+    const { source, destination } = result;
+    if (!destination) return;
+    if (
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    ) {
       return;
     }
-    try {
-      await updateRSVPSeating(rsvpId, tableNum, seatNum);
-      if (isMounted.current) {
-        setRsvps(prev =>
-          prev.map(rsvp =>
-            rsvp.id === rsvpId
-              ? { ...rsvp, table: tableNum, seat: seatNum }
-              : rsvp
-          )
-        );
-      }
-    } catch (err) {
-      alert('Failed to update seating assignment');
-      console.error('Error updating seating:', err);
-    } finally {
-      if (isMounted.current) {
-        setEditStates(prev => ({
-          ...prev,
-          [rsvpId]: { ...prev[rsvpId], saving: false },
-        }));
+    setSyncing(true);
+    // Find the RSVP being moved
+    const rsvp = columns[source.droppableId][source.index];
+    // Remove from source
+    const newSource = Array.from(columns[source.droppableId]);
+    newSource.splice(source.index, 1);
+    // Insert into destination
+    const newDest = Array.from(columns[destination.droppableId]);
+    newDest.splice(destination.index, 0, rsvp);
+    // Build new columns
+    const newColumns = { ...columns };
+    newColumns[source.droppableId] = newSource;
+    newColumns[destination.droppableId] = newDest;
+    setColumns(newColumns);
+    // Update backend for all guests in destination column
+    if (destination.droppableId === UNASSIGNED) {
+      await updateRSVPSeating(rsvp.id, null as any, null as any);
+    } else {
+      for (let i = 0; i < newDest.length; ++i) {
+        const guest = newDest[i];
+        const newTable = parseInt(destination.droppableId);
+        const newSeat = i + 1;
+        if (guest.table !== newTable || guest.seat !== newSeat) {
+          await updateRSVPSeating(guest.id, newTable, newSeat);
+        }
       }
     }
-  }
+    if (
+      source.droppableId !== destination.droppableId &&
+      source.droppableId !== UNASSIGNED
+    ) {
+      const srcArr = newColumns[source.droppableId];
+      for (let i = 0; i < srcArr.length; ++i) {
+        const guest = srcArr[i];
+        const newTable = parseInt(source.droppableId);
+        const newSeat = i + 1;
+        if (guest.table !== newTable || guest.seat !== newSeat) {
+          await updateRSVPSeating(guest.id, newTable, newSeat);
+        }
+      }
+    }
+    // Re-fetch from backend to sync
+    await fetchSeatingColumns();
+    setSyncing(false);
+  };
 
   if (!isAuthenticated) {
     return (
@@ -153,90 +154,107 @@ export default function AdminSeatingPage() {
           Seating Management
         </h1>
         <p className="text-lg text-gray-600">
-          Assign table and seat numbers to RSVPs
+          Drag and drop guests to assign tables and seats
         </p>
       </div>
-
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle>RSVP List</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-300">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="border border-gray-300 px-4 py-2 text-left">
-                    Name
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">
-                    Email
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">
-                    Table
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">
-                    Seat
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {rsvps.map(rsvp => (
-                  <tr key={rsvp.id} className="hover:bg-gray-50">
-                    <td className="border border-gray-300 px-4 py-2">
-                      {rsvp.first_name} {rsvp.last_name}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      {rsvp.email}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      <Input
-                        type="number"
-                        value={editStates[rsvp.id]?.table || ''}
-                        onChange={e =>
-                          handleInputChange(rsvp.id, 'table', e.target.value)
-                        }
-                        placeholder="Table #"
-                        className="w-20"
-                        min={1}
-                      />
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      <div className="flex items-center gap-2">
-                        <Input
-                          type="number"
-                          value={editStates[rsvp.id]?.seat || ''}
-                          onChange={e =>
-                            handleInputChange(rsvp.id, 'seat', e.target.value)
-                          }
-                          placeholder="Seat #"
-                          className="w-20"
-                          min={1}
-                        />
-                        <Button
-                          size="sm"
-                          className="bg-green-600 hover:bg-green-700"
-                          onClick={() => handleSave(rsvp.id)}
-                          disabled={editStates[rsvp.id]?.saving}
-                        >
-                          {editStates[rsvp.id]?.saving ? 'Saving…' : 'Save'}
-                        </Button>
+      <DragDropContext onDragEnd={syncing ? () => {} : onDragEnd}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+          {/* Table columns */}
+          {Array.from({ length: TABLE_COUNT }, (_, i) => i + 1).map(
+            tableNum => (
+              <Droppable droppableId={tableNum.toString()} key={tableNum}>
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className={`min-h-[300px] bg-white/80 border-rose-200 border rounded-xl shadow p-4 flex flex-col ${snapshot.isDraggingOver ? 'ring-2 ring-rose-400' : ''}`}
+                  >
+                    <div className="text-lg font-bold text-rose-600 text-center mb-2">
+                      Table {tableNum}
+                    </div>
+                    {columns[tableNum]?.map((rsvp, idx) => (
+                      <Draggable
+                        key={rsvp.id}
+                        draggableId={rsvp.id.toString()}
+                        index={idx}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={`mb-3 p-3 bg-rose-50 rounded-lg border border-rose-100 flex flex-col shadow-sm ${snapshot.isDragging ? 'ring-2 ring-rose-400' : ''}`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-gray-800">
+                                {rsvp.first_name} {rsvp.last_name}
+                              </span>
+                              <span className="inline-flex items-center justify-center w-8 h-8 bg-rose-500 text-white text-sm font-bold rounded-full ml-2">
+                                {idx + 1}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            )
+          )}
+          {/* Unassigned column */}
+          <Droppable droppableId={UNASSIGNED}>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className={`min-h-[300px] bg-white/80 border-rose-200 border rounded-xl shadow p-4 flex flex-col ${snapshot.isDraggingOver ? 'ring-2 ring-rose-400' : ''}`}
+              >
+                <div className="text-lg font-bold text-gray-700 text-center mb-2">
+                  Unassigned
+                </div>
+                {columns[UNASSIGNED]?.map((rsvp, idx) => (
+                  <Draggable
+                    key={rsvp.id}
+                    draggableId={rsvp.id.toString()}
+                    index={idx}
+                  >
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className={`mb-3 p-3 bg-rose-50 rounded-lg border border-rose-100 flex flex-col shadow-sm ${snapshot.isDragging ? 'ring-2 ring-rose-400' : ''}`}
+                      >
+                        <span className="font-medium text-gray-800">
+                          {rsvp.first_name} {rsvp.last_name}
+                        </span>
                       </div>
-                    </td>
-                  </tr>
+                    )}
+                  </Draggable>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </div>
+      </DragDropContext>
       <div className="mt-8 text-center">
         <p className="text-sm text-gray-500">
-          Total RSVPs: {rsvps.length} | Assigned seating:{' '}
-          {rsvps.filter(r => r.table && r.seat).length}
+          Total RSVPs: {Object.values(columns).flat().length}
         </p>
       </div>
+      {syncing && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 shadow-lg flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mb-4"></div>
+            <p className="text-gray-700 font-medium">
+              Syncing seating assignments...
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

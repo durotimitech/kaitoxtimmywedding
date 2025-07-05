@@ -42,5 +42,7 @@ export interface RSVP {
   last_name: string;
   email: string;
   phone?: string;
+  table?: number;
+  seat?: number;
   created_at: string;
 }

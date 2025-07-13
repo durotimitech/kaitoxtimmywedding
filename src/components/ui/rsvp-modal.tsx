@@ -69,9 +69,32 @@ const ModalTitle = styled.h2`
 
 const ModalMessage = styled.p`
   color: ${props => props.theme.colors.textLight};
-  margin-bottom: ${props => props.theme.spacing.xl};
+  margin-bottom: ${props => props.theme.spacing.lg};
   text-align: center;
   line-height: 1.6;
+`;
+
+const WeddingInfo = styled.div`
+  text-align: center;
+  margin-bottom: ${props => props.theme.spacing.xl};
+  padding: ${props => props.theme.spacing.md};
+  background: rgba(212, 175, 55, 0.05);
+  border-radius: ${props => props.theme.borderRadius.md};
+  border: 1px solid rgba(212, 175, 55, 0.1);
+`;
+
+const WeddingDate = styled.div`
+  font-family: var(--font-playfair);
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: ${props => props.theme.colors.primary};
+  margin-bottom: ${props => props.theme.spacing.xs};
+`;
+
+const WeddingLocation = styled.div`
+  font-size: 1rem;
+  color: ${props => props.theme.colors.textLight};
+  font-weight: 400;
 `;
 
 const Form = styled.form`
@@ -307,6 +330,10 @@ export function RSVPModal({ isOpen, onClose }: RSVPModalProps) {
                 We&apos;re so excited to celebrate with you! Please fill out the
                 form below to reserve your spot at our special day.
               </ModalMessage>
+              <WeddingInfo>
+                <WeddingDate>Monday, September 8th, 2025</WeddingDate>
+                <WeddingLocation>Limerick, Ireland</WeddingLocation>
+              </WeddingInfo>
             </motion.div>
 
             <AnimatePresence mode="wait">

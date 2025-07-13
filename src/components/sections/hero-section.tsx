@@ -68,6 +68,32 @@ const MainTitle = styled.h1`
   margin-bottom: ${props => props.theme.spacing.lg};
 `;
 
+const WeddingDate = styled.div`
+  font-family: var(--font-playfair);
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  font-weight: 300;
+  color: ${props => props.theme.colors.primary};
+  margin-bottom: ${props => props.theme.spacing.sm};
+  letter-spacing: 1px;
+
+  @media (max-width: ${props => props.theme.breakpoints.lg}) {
+    text-align: center;
+  }
+`;
+
+const WeddingLocation = styled.div`
+  font-family: var(--font-playfair);
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-weight: 300;
+  color: ${props => props.theme.colors.textLight};
+  margin-bottom: ${props => props.theme.spacing.xl};
+  letter-spacing: 0.5px;
+
+  @media (max-width: ${props => props.theme.breakpoints.lg}) {
+    text-align: center;
+  }
+`;
+
 // Removed unused Description component
 
 const CTAButton = styled(motion.button)`
@@ -246,6 +272,14 @@ export function HeroSection() {
               transition={{ duration: 0.6, delay: 0.4 }}
             >
               <MainTitle>Come celebrate this important day with us!</MainTitle>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <WeddingDate>Monday, September 8th, 2024</WeddingDate>
+              <WeddingLocation>Limerick, Ireland</WeddingLocation>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}

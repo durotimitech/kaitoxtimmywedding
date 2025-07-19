@@ -30,6 +30,7 @@ export default function Home() {
         <HeroSection />
         <CountdownSection />
         <AboutSection />
+        <BankDetailsSection />
         <ProposalVideoSection />
         <PhotoGallerySection />
         <ProtectedSection sectionType="ceremony">
@@ -42,7 +43,6 @@ export default function Home() {
         <ProtectedSection sectionType="songs">
           <SongRequestSection />
         </ProtectedSection>
-        <BankDetailsSection />
         <GuestbookSection
           isModalOpen={isMessageModalOpen}
           onOpenModal={openMessageModal}

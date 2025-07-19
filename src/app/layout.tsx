@@ -24,7 +24,7 @@ const dancingScript = Dancing_Script({
 export const metadata: Metadata = {
   title: 'Kaito & Timmy | Our Wedding',
   description:
-    'Join us as we celebrate our love story. Saturday, October 26, 2024',
+    'Join us as we celebrate our love story. Monday, September 8, 2025',
   icons: {
     icon: [
       {

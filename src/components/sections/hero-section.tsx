@@ -278,7 +278,7 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
-              <WeddingDate>Monday, September 8th, 2024</WeddingDate>
+              <WeddingDate>Monday, September 8th, 2025</WeddingDate>
               <WeddingLocation>Limerick, Ireland</WeddingLocation>
             </motion.div>
             <motion.div

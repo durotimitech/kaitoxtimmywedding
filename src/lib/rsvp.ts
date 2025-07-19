@@ -106,8 +106,8 @@ export async function getSeatingChart(): Promise<{
 
 export async function updateRSVPSeating(
   rsvpId: number,
-  table: number,
-  seat: number
+  table: number | null,
+  seat: number | null
 ): Promise<void> {
   if (!isSupabaseConfigured()) {
     throw new Error(

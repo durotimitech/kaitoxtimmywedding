@@ -7,6 +7,10 @@ import {
   DragDropContext,
   Droppable,
   Draggable,
+  DroppableProvided,
+  DraggableProvided,
+  DroppableStateSnapshot,
+  DraggableStateSnapshot,
   DropResult,
 } from '@hello-pangea/dnd';
 
@@ -82,7 +86,7 @@ export default function AdminSeatingPage() {
     setColumns(newColumns);
     // Update backend for all guests in destination column
     if (destination.droppableId === UNASSIGNED) {
-      await updateRSVPSeating(rsvp.id, null as any, null as any);
+      await updateRSVPSeating(rsvp.id, null, null);
     } else {
       for (let i = 0; i < newDest.length; ++i) {
         const guest = newDest[i];
@@ -157,13 +161,24 @@ export default function AdminSeatingPage() {
           Drag and drop guests to assign tables and seats
         </p>
       </div>
-      <DragDropContext onDragEnd={syncing ? () => {} : onDragEnd}>
+      <DragDropContext
+        onDragEnd={
+          syncing
+            ? () => {
+                /* Disabled during sync */
+              }
+            : onDragEnd
+        }
+      >
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
           {/* Table columns */}
           {Array.from({ length: TABLE_COUNT }, (_, i) => i + 1).map(
             tableNum => (
               <Droppable droppableId={tableNum.toString()} key={tableNum}>
-                {(provided, snapshot) => (
+                {(
+                  provided: DroppableProvided,
+                  snapshot: DroppableStateSnapshot
+                ) => (
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
@@ -178,7 +193,10 @@ export default function AdminSeatingPage() {
                         draggableId={rsvp.id.toString()}
                         index={idx}
                       >
-                        {(provided, snapshot) => (
+                        {(
+                          provided: DraggableProvided,
+                          snapshot: DraggableStateSnapshot
+                        ) => (
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
@@ -205,7 +223,10 @@ export default function AdminSeatingPage() {
           )}
           {/* Unassigned column */}
           <Droppable droppableId={UNASSIGNED}>
-            {(provided, snapshot) => (
+            {(
+              provided: DroppableProvided,
+              snapshot: DroppableStateSnapshot
+            ) => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
@@ -220,7 +241,10 @@ export default function AdminSeatingPage() {
                     draggableId={rsvp.id.toString()}
                     index={idx}
                   >
-                    {(provided, snapshot) => (
+                    {(
+                      provided: DraggableProvided,
+                      snapshot: DraggableStateSnapshot
+                    ) => (
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}

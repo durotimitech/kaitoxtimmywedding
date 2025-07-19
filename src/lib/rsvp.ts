@@ -66,3 +66,62 @@ export async function checkEmailExists(email: string): Promise<boolean> {
 
   return !!data;
 }
+
+export async function getSeatingChart(): Promise<{
+  [tableNumber: number]: RSVP[];
+}> {
+  if (!isSupabaseConfigured()) {
+    throw new Error(
+      'Supabase is not configured. Please check your environment variables.'
+    );
+  }
+
+  const { data: rsvps, error } = await supabase
+    .from('rsvps')
+    .select('*')
+    .not('table', 'is', null)
+    .not('seat', 'is', null)
+    .order('table', { ascending: true })
+    .order('seat', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching seating chart:', error);
+    throw new Error('Failed to fetch seating chart.');
+  }
+
+  // Group RSVPs by table
+  const seatingChart: { [tableNumber: number]: RSVP[] } = {};
+
+  rsvps?.forEach(rsvp => {
+    if (rsvp.table) {
+      if (!seatingChart[rsvp.table]) {
+        seatingChart[rsvp.table] = [];
+      }
+      seatingChart[rsvp.table].push(rsvp);
+    }
+  });
+
+  return seatingChart;
+}
+
+export async function updateRSVPSeating(
+  rsvpId: number,
+  table: number,
+  seat: number
+): Promise<void> {
+  if (!isSupabaseConfigured()) {
+    throw new Error(
+      'Supabase is not configured. Please check your environment variables.'
+    );
+  }
+
+  const { error } = await supabase
+    .from('rsvps')
+    .update({ table, seat })
+    .eq('id', rsvpId);
+
+  if (error) {
+    console.error('Error updating RSVP seating:', error);
+    throw new Error('Failed to update RSVP seating.');
+  }
+}

@@ -144,7 +144,7 @@ export function FAQSection() {
     {
       question: 'Are children welcome at the wedding?',
       answer:
-        'We love your little ones! Children are welcome at our wedding. Please let us know when you RSVP if you&apos;re bringing children so we can ensure appropriate seating and meals.',
+        'We love your little ones! Children are welcome at our wedding. Please let us know when you RSVP if you are bringing children so we can ensure appropriate seating and meals.',
     },
     {
       question: 'Is the wedding indoors or outdoors?',

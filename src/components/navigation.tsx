@@ -247,6 +247,17 @@ export function Navigation() {
           >
             Photobook
           </NavLink>
+          <NavLink
+            href="#gifts"
+            whileHover={{
+              color: '#D4AF37',
+              scale: 1.05,
+              transition: { type: 'spring', stiffness: 400, damping: 17 },
+            }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Gifts
+          </NavLink>
         </RightNavLinks>
 
         <MobileMenuButton

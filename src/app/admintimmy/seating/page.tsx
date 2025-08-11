@@ -18,7 +18,7 @@ interface SeatingColumns {
   [tableNumber: string]: RSVP[];
 }
 
-const TABLE_COUNT = 8;
+const TABLE_COUNT = 9;
 const UNASSIGNED = 'unassigned';
 
 export default function AdminSeatingPage() {

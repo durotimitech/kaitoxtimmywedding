@@ -19,14 +19,16 @@ const NavContainer = styled(motion.nav)`
 const NavContent = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   padding: 0 ${props => props.theme.spacing.lg};
-  position: relative;
+  gap: ${props => props.theme.spacing.xl};
 
   @media (max-width: ${props => props.theme.breakpoints.md}) {
     padding: 0 ${props => props.theme.spacing.md};
+    display: flex;
+    justify-content: space-between;
   }
 `;
 
@@ -43,6 +45,7 @@ const LeftNavLinks = styled(motion.div)`
 const RightNavLinks = styled(motion.div)`
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: ${props => props.theme.spacing.xl};
 
   @media (max-width: ${props => props.theme.breakpoints.md}) {
@@ -68,11 +71,9 @@ const NavLink = styled(motion.a)`
 `;
 
 const Logo = styled(motion.div)`
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: ${props => props.theme.spacing.sm};
   font-family: var(--font-dancing);
   font-size: 1.8rem;
@@ -80,8 +81,7 @@ const Logo = styled(motion.div)`
   font-weight: 600;
 
   @media (max-width: ${props => props.theme.breakpoints.md}) {
-    position: static;
-    transform: none;
+    justify-content: flex-start;
   }
 `;
 

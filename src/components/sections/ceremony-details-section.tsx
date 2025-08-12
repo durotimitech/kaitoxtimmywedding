@@ -149,7 +149,6 @@ export function CeremonyDetailsSection() {
 
   return (
     <CeremonyContainer
-      id="ceremony"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '-100px' }}

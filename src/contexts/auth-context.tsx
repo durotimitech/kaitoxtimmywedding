@@ -13,10 +13,13 @@ interface AuthContextType {
   user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  showAttendanceModal: boolean;
   login: (
     credentials: AuthCredentials
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  closeAttendanceModal: () => void;
+  openAttendanceModal: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,6 +39,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
 
   // Check for existing authentication on mount
   useEffect(() => {
@@ -44,6 +48,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const existingUser = AuthService.getAuthenticatedUser();
         if (existingUser) {
           setUser(existingUser);
+          // Show attendance modal every time for authenticated users
+          setShowAttendanceModal(true);
         }
       } catch (error) {
         console.error('Error checking authentication:', error);
@@ -63,6 +69,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       if (result.success && result.user) {
         setUser(result.user);
+        // Show attendance modal after successful login
+        setShowAttendanceModal(true);
         return { success: true };
       } else {
         return {
@@ -83,14 +91,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = () => {
     AuthService.clearAuthentication();
     setUser(null);
+    setShowAttendanceModal(false);
+  };
+
+  const closeAttendanceModal = () => {
+    setShowAttendanceModal(false);
+  };
+
+  const openAttendanceModal = () => {
+    setShowAttendanceModal(true);
   };
 
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
     isLoading,
+    showAttendanceModal,
     login,
     logout,
+    closeAttendanceModal,
+    openAttendanceModal,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,7 +1,7 @@
 'use client';
 
 import styled from 'styled-components';
-import { MessageCircle, Gift, MapPin } from 'lucide-react';
+import { MessageCircle, Gift, MapPin, Heart } from 'lucide-react';
 
 const FloatingNav = styled.nav`
   position: fixed;
@@ -100,12 +100,23 @@ const smoothScrollTo = (elementId: string) => {
 
 interface FloatingNavigationProps {
   onSendMessage: () => void;
+  onRSVP: () => void;
 }
 
-export function FloatingNavigation({ onSendMessage }: FloatingNavigationProps) {
+export function FloatingNavigation({
+  onSendMessage,
+  onRSVP,
+}: FloatingNavigationProps) {
   return (
     <FloatingNav>
       <NavContainer>
+        <NavButton onClick={onRSVP}>
+          <ButtonIcon>
+            <Heart size={18} />
+          </ButtonIcon>
+          <ButtonText>RSVP</ButtonText>
+        </NavButton>
+
         <NavButton onClick={onSendMessage}>
           <ButtonIcon>
             <MessageCircle size={18} />

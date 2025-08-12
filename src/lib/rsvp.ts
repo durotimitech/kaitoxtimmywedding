@@ -126,3 +126,94 @@ export async function updateRSVPSeating(
     throw new Error('Failed to update RSVP seating.');
   }
 }
+
+export async function updateAttendanceStatus(
+  credentials: {
+    first_name: string;
+    last_name: string;
+    email: string;
+  },
+  attending: boolean
+): Promise<{ success: boolean; error?: string }> {
+  if (!isSupabaseConfigured()) {
+    throw new Error(
+      'Supabase is not configured. Please check your environment variables.'
+    );
+  }
+
+  try {
+    // Get all RSVPs to check against
+    const { data: rsvps, error: fetchError } = await supabase
+      .from('rsvps')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (fetchError) {
+      console.error('Error fetching RSVPs:', fetchError);
+      throw new Error('Failed to fetch RSVPs.');
+    }
+
+    if (!rsvps || rsvps.length === 0) {
+      return { success: false, error: 'No RSVP found.' };
+    }
+
+    // Normalize input credentials
+    const normalizedInput = {
+      first_name: credentials.first_name.trim().toLowerCase(),
+      last_name: credentials.last_name.trim().toLowerCase(),
+      email: credentials.email.trim().toLowerCase(),
+    };
+
+    // Find matching RSVP using 2/3 logic
+    let matchedRsvp = null;
+
+    for (const rsvp of rsvps) {
+      // Skip records with missing required fields
+      if (!rsvp.first_name || !rsvp.last_name || !rsvp.email) {
+        continue;
+      }
+
+      const normalizedRsvp = {
+        first_name: rsvp.first_name.trim().toLowerCase(),
+        last_name: rsvp.last_name.trim().toLowerCase(),
+        email: rsvp.email.trim().toLowerCase(),
+      };
+
+      let matches = 0;
+
+      // Count matches
+      if (normalizedInput.first_name === normalizedRsvp.first_name) matches++;
+      if (normalizedInput.last_name === normalizedRsvp.last_name) matches++;
+      if (normalizedInput.email === normalizedRsvp.email) matches++;
+
+      // If 2 or more fields match, we found the RSVP
+      if (matches >= 2) {
+        matchedRsvp = rsvp;
+        break;
+      }
+    }
+
+    if (!matchedRsvp) {
+      return { success: false, error: 'No matching RSVP found.' };
+    }
+
+    // Update the attending status
+    const { error: updateError } = await supabase
+      .from('rsvps')
+      .update({ attending })
+      .eq('id', matchedRsvp.id);
+
+    if (updateError) {
+      console.error('Error updating attendance:', updateError);
+      throw new Error('Failed to update attendance status.');
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating attendance status:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Something went wrong.',
+    };
+  }
+}

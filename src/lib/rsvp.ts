@@ -5,6 +5,7 @@ export interface RSVPData {
   last_name: string;
   email: string;
   phone?: string;
+  attending?: boolean;
 }
 
 export async function addRSVP(data: RSVPData): Promise<RSVP> {

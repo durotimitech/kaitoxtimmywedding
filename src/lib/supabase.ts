@@ -44,5 +44,6 @@ export interface RSVP {
   phone?: string;
   table?: number;
   seat?: number;
+  attending?: boolean;
   created_at: string;
 }

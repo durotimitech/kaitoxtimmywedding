@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Search } from 'lucide-react';
 import { RSVP } from '@/lib/supabase';
 import { getSeatingChart, getRSVPs, updateRSVPSeating } from '@/lib/rsvp';
 import {
@@ -27,6 +28,7 @@ export default function AdminSeatingPage() {
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const stored = localStorage.getItem('wedding_auth_user');
@@ -151,15 +153,47 @@ export default function AdminSeatingPage() {
     );
   }
 
+  // Filter columns based on search query
+  const filteredColumns = searchQuery
+    ? Object.entries(columns).reduce((acc, [key, guests]) => {
+        const filtered = guests.filter(guest => {
+          const fullName =
+            `${guest.first_name} ${guest.last_name}`.toLowerCase();
+          return fullName.includes(searchQuery.toLowerCase());
+        });
+        if (filtered.length > 0 || key === UNASSIGNED) {
+          acc[key] = filtered;
+        }
+        return acc;
+      }, {} as SeatingColumns)
+    : columns;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
           Seating Management
         </h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-gray-600 mb-6">
           Drag and drop guests to assign tables and seats
         </p>
+
+        {/* Search Box */}
+        <div className="max-w-md mx-auto mb-6">
+          <div className="relative">
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={20}
+            />
+            <input
+              type="text"
+              placeholder="Search guests by name..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+            />
+          </div>
+        </div>
       </div>
       <DragDropContext
         onDragEnd={
@@ -187,7 +221,7 @@ export default function AdminSeatingPage() {
                     <div className="text-lg font-bold text-rose-600 text-center mb-2">
                       Table {tableNum}
                     </div>
-                    {columns[tableNum]?.map((rsvp, idx) => (
+                    {filteredColumns[tableNum]?.map((rsvp, idx) => (
                       <Draggable
                         key={rsvp.id}
                         draggableId={rsvp.id.toString()}
@@ -201,10 +235,24 @@ export default function AdminSeatingPage() {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className={`mb-3 p-3 bg-rose-50 rounded-lg border border-rose-100 flex flex-col shadow-sm ${snapshot.isDragging ? 'ring-2 ring-rose-400' : ''}`}
+                            className={`mb-3 p-3 rounded-lg border flex flex-col shadow-sm ${
+                              snapshot.isDragging ? 'ring-2 ring-rose-400' : ''
+                            } ${
+                              rsvp.attending === true
+                                ? 'bg-green-50 border-green-200'
+                                : rsvp.attending === false
+                                  ? 'bg-red-700 border-red-700'
+                                  : 'bg-rose-50 border-rose-100'
+                            }`}
                           >
                             <div className="flex items-center justify-between">
-                              <span className="font-medium text-gray-800">
+                              <span
+                                className={`font-medium ${
+                                  rsvp.attending === false
+                                    ? 'text-white'
+                                    : 'text-gray-800'
+                                }`}
+                              >
                                 {rsvp.first_name} {rsvp.last_name}
                               </span>
                               <span className="inline-flex items-center justify-center w-8 h-8 bg-rose-500 text-white text-sm font-bold rounded-full ml-2">
@@ -235,7 +283,7 @@ export default function AdminSeatingPage() {
                 <div className="text-lg font-bold text-gray-700 text-center mb-2">
                   Unassigned
                 </div>
-                {columns[UNASSIGNED]?.map((rsvp, idx) => (
+                {filteredColumns[UNASSIGNED]?.map((rsvp, idx) => (
                   <Draggable
                     key={rsvp.id}
                     draggableId={rsvp.id.toString()}
@@ -249,9 +297,23 @@ export default function AdminSeatingPage() {
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        className={`mb-3 p-3 bg-rose-50 rounded-lg border border-rose-100 flex flex-col shadow-sm ${snapshot.isDragging ? 'ring-2 ring-rose-400' : ''}`}
+                        className={`mb-3 p-3 rounded-lg border flex flex-col shadow-sm ${
+                          snapshot.isDragging ? 'ring-2 ring-rose-400' : ''
+                        } ${
+                          rsvp.attending === true
+                            ? 'bg-green-50 border-green-200'
+                            : rsvp.attending === false
+                              ? 'bg-red-700 border-red-700'
+                              : 'bg-rose-50 border-rose-100'
+                        }`}
                       >
-                        <span className="font-medium text-gray-800">
+                        <span
+                          className={`font-medium ${
+                            rsvp.attending === false
+                              ? 'text-white'
+                              : 'text-gray-800'
+                          }`}
+                        >
                           {rsvp.first_name} {rsvp.last_name}
                         </span>
                       </div>
@@ -264,10 +326,24 @@ export default function AdminSeatingPage() {
           </Droppable>
         </div>
       </DragDropContext>
-      <div className="mt-8 text-center">
+      <div className="mt-8 text-center space-y-2">
         <p className="text-sm text-gray-500">
           Total RSVPs: {Object.values(columns).flat().length}
         </p>
+        <div className="flex justify-center gap-4 text-sm">
+          <span className="flex items-center gap-2">
+            <span className="w-4 h-4 bg-green-50 border border-green-200 rounded"></span>
+            Attending
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="w-4 h-4 bg-red-700 border border-red-700 rounded"></span>
+            Not Attending
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="w-4 h-4 bg-rose-50 border border-rose-100 rounded"></span>
+            No Response
+          </span>
+        </div>
       </div>
       {syncing && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">

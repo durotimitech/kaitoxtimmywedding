@@ -1,7 +1,7 @@
 'use client';
 
 import styled from 'styled-components';
-import { MessageCircle, Gift, MapPin, Heart } from 'lucide-react';
+import { MessageCircle, Gift, Heart } from 'lucide-react';
 
 const FloatingNav = styled.nav`
   position: fixed;
@@ -129,25 +129,6 @@ export function FloatingNavigation({
             <Gift size={18} />
           </ButtonIcon>
           <ButtonText>Give Cash Gifts</ButtonText>
-        </NavButton>
-        {/*         
-        <NavButton 
-          as="a" 
-          href="https://www.example.com/registry" 
-          target="_blank" 
-          rel="noopener noreferrer"
-        >
-          <ButtonIcon>
-            <ExternalLink size={18} />
-          </ButtonIcon>
-          <ButtonText>View Registry Items</ButtonText>
-        </NavButton> */}
-
-        <NavButton onClick={() => smoothScrollTo('ceremony')}>
-          <ButtonIcon>
-            <MapPin size={18} />
-          </ButtonIcon>
-          <ButtonText>Venue Details</ButtonText>
         </NavButton>
       </NavContainer>
     </FloatingNav>

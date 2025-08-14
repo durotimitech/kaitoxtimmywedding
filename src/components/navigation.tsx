@@ -3,6 +3,8 @@
 import styled from 'styled-components';
 import { motion } from 'motion/react';
 import { Heart } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 
 const NavContainer = styled(motion.nav)`
   position: fixed;
@@ -139,6 +141,31 @@ const smoothScrollTo = (elementId: string) => {
 };
 
 export function Navigation() {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleNavClick = (elementId: string) => {
+    if (pathname === '/') {
+      // If we're on the home page, just scroll
+      smoothScrollTo(elementId);
+    } else {
+      // If we're on another page, navigate to home with the hash
+      router.push(`/#${elementId}`);
+    }
+  };
+
+  // Handle hash navigation after page load
+  useEffect(() => {
+    if (pathname === '/' && window.location.hash) {
+      // Remove the # from the hash
+      const elementId = window.location.hash.substring(1);
+      // Wait a bit for the page to render
+      setTimeout(() => {
+        smoothScrollTo(elementId);
+      }, 100);
+    }
+  }, [pathname]);
+
   return (
     <NavContainer
       initial={{ y: -100, opacity: 0 }}
@@ -152,7 +179,7 @@ export function Navigation() {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <NavLink
-            onClick={() => smoothScrollTo('hero')}
+            onClick={() => handleNavClick('hero')}
             whileHover={{
               color: '#D4AF37',
               scale: 1.05,
@@ -163,7 +190,7 @@ export function Navigation() {
             Home
           </NavLink>
           <NavLink
-            onClick={() => smoothScrollTo('about')}
+            onClick={() => handleNavClick('about')}
             whileHover={{
               color: '#D4AF37',
               scale: 1.05,
@@ -174,7 +201,7 @@ export function Navigation() {
             About
           </NavLink>
           <NavLink
-            onClick={() => smoothScrollTo('travel')}
+            onClick={() => handleNavClick('travel')}
             whileHover={{
               color: '#D4AF37',
               scale: 1.05,
@@ -215,7 +242,7 @@ export function Navigation() {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <NavLink
-            onClick={() => smoothScrollTo('faq')}
+            onClick={() => handleNavClick('faq')}
             whileHover={{
               color: '#D4AF37',
               scale: 1.05,
@@ -226,7 +253,7 @@ export function Navigation() {
             FAQ
           </NavLink>
           <NavLink
-            onClick={() => smoothScrollTo('song-requests')}
+            onClick={() => handleNavClick('song-requests')}
             whileHover={{
               color: '#D4AF37',
               scale: 1.05,
@@ -237,7 +264,7 @@ export function Navigation() {
             Songs
           </NavLink>
           <NavLink
-            onClick={() => smoothScrollTo('gallery')}
+            onClick={() => handleNavClick('gallery')}
             whileHover={{
               color: '#D4AF37',
               scale: 1.05,
@@ -248,7 +275,7 @@ export function Navigation() {
             Photobook
           </NavLink>
           <NavLink
-            href="#gifts"
+            onClick={() => handleNavClick('gifts')}
             whileHover={{
               color: '#D4AF37',
               scale: 1.05,

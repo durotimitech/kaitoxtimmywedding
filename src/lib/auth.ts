@@ -13,6 +13,17 @@ export interface AuthUser {
   authenticated_at: string;
 }
 
+export interface LoginAttempt {
+  first_name: string;
+  last_name: string;
+  email: string;
+  success: boolean;
+  matched_fields: number;
+  ip_address?: string;
+  user_agent?: string;
+  error_message?: string;
+}
+
 const AUTH_STORAGE_KEY = 'wedding_auth_user';
 
 export class AuthService {
@@ -67,9 +78,39 @@ export class AuthService {
     }
   }
 
+  // Log login attempt to database
+  static async logLoginAttempt(attempt: LoginAttempt): Promise<void> {
+    if (!isSupabaseConfigured()) {
+      console.error('Supabase is not configured for logging');
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from('login_attempts').insert([
+        {
+          first_name: attempt.first_name,
+          last_name: attempt.last_name,
+          email: attempt.email,
+          success: attempt.success,
+          matched_fields: attempt.matched_fields,
+          ip_address: attempt.ip_address,
+          user_agent: attempt.user_agent,
+          error_message: attempt.error_message,
+        },
+      ]);
+
+      if (error) {
+        console.error('Error logging login attempt:', error);
+      }
+    } catch (error) {
+      console.error('Unexpected error logging login attempt:', error);
+    }
+  }
+
   // Verify credentials against RSVP table with 2/3 matching logic
   static async verifyCredentials(
-    credentials: AuthCredentials
+    credentials: AuthCredentials,
+    metadata?: { ip_address?: string; user_agent?: string }
   ): Promise<{ success: boolean; user?: AuthUser }> {
     if (!isSupabaseConfigured()) {
       throw new Error('Supabase is not configured.');
@@ -97,6 +138,16 @@ export class AuthService {
         !credentials.last_name ||
         !credentials.email
       ) {
+        await this.logLoginAttempt({
+          first_name: credentials.first_name || '',
+          last_name: credentials.last_name || '',
+          email: credentials.email || '',
+          success: false,
+          matched_fields: 0,
+          ip_address: metadata?.ip_address,
+          user_agent: metadata?.user_agent,
+          error_message: 'Missing required fields',
+        });
         return { success: false };
       }
 
@@ -106,6 +157,9 @@ export class AuthService {
         last_name: credentials.last_name.trim().toLowerCase(),
         email: credentials.email.trim().toLowerCase(),
       };
+
+      // Track the highest match count for logging
+      let highestMatchCount = 0;
 
       // Check each RSVP record for 2/3 match
       for (const rsvp of rsvps) {
@@ -127,6 +181,11 @@ export class AuthService {
         if (normalizedInput.last_name === normalizedRsvp.last_name) matches++;
         if (normalizedInput.email === normalizedRsvp.email) matches++;
 
+        // Update highest match count for logging
+        if (matches > highestMatchCount) {
+          highestMatchCount = matches;
+        }
+
         // If 2 or more fields match, authentication succeeds
         if (matches >= 2) {
           const authenticatedUser: AuthUser = {
@@ -137,11 +196,34 @@ export class AuthService {
           };
 
           this.setAuthenticatedUser(authenticatedUser);
+
+          // Log successful attempt
+          await this.logLoginAttempt({
+            first_name: credentials.first_name,
+            last_name: credentials.last_name,
+            email: credentials.email,
+            success: true,
+            matched_fields: matches,
+            ip_address: metadata?.ip_address,
+            user_agent: metadata?.user_agent,
+          });
+
           return { success: true, user: authenticatedUser };
         }
       }
 
-      // No match found
+      // No match found - log failed attempt
+      await this.logLoginAttempt({
+        first_name: credentials.first_name,
+        last_name: credentials.last_name,
+        email: credentials.email,
+        success: false,
+        matched_fields: highestMatchCount,
+        ip_address: metadata?.ip_address,
+        user_agent: metadata?.user_agent,
+        error_message: `Best match was ${highestMatchCount}/3 fields`,
+      });
+
       return { success: false };
     } catch (error) {
       console.error('Error verifying credentials:', error);

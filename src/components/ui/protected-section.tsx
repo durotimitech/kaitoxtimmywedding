@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginModal } from '@/components/ui/login-modal';
-import { ReservationModal } from '@/components/ui/modal';
+import { LoginFailureModal } from '@/components/login-failure-modal';
 import { LoadingFallback, SectionType } from '@/components/ui/loading-fallback';
 
 interface ProtectedSectionProps {
@@ -19,7 +19,7 @@ export function ProtectedSection({
 }: ProtectedSectionProps) {
   const { isAuthenticated, isLoading } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showReservationModal, setShowReservationModal] = useState(false);
+  const [showLoginFailureModal, setShowLoginFailureModal] = useState(false);
 
   // Remove automatic modal opening - only show on user click
 
@@ -29,15 +29,15 @@ export function ProtectedSection({
 
   const handleAuthFailed = () => {
     setShowLoginModal(false);
-    setShowReservationModal(true);
+    setShowLoginFailureModal(true);
   };
 
   const handleCloseLogin = () => {
     setShowLoginModal(false);
   };
 
-  const handleCloseReservation = () => {
-    setShowReservationModal(false);
+  const handleCloseLoginFailure = () => {
+    setShowLoginFailureModal(false);
   };
 
   // Show loading state
@@ -55,9 +55,9 @@ export function ProtectedSection({
           onClose={handleCloseLogin}
           onAuthFailed={handleAuthFailed}
         />
-        <ReservationModal
-          isOpen={showReservationModal}
-          onClose={handleCloseReservation}
+        <LoginFailureModal
+          isOpen={showLoginFailureModal}
+          onClose={handleCloseLoginFailure}
         />
       </>
     );
@@ -84,9 +84,9 @@ export function ProtectedSection({
         onAuthFailed={handleAuthFailed}
       />
 
-      <ReservationModal
-        isOpen={showReservationModal}
-        onClose={handleCloseReservation}
+      <LoginFailureModal
+        isOpen={showLoginFailureModal}
+        onClose={handleCloseLoginFailure}
       />
     </>
   );

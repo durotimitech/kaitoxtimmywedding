@@ -9,7 +9,7 @@ import { AuthProvider } from '@/contexts/auth-context';
 import { AttendanceModalHandler } from '@/components/attendance-modal-handler';
 import { useAuth } from '@/contexts/auth-context';
 import { LoginModal } from '@/components/ui/login-modal';
-import { ReservationModal } from '@/components/ui/modal';
+import { LoginFailureModal } from '@/components/login-failure-modal';
 import { Utensils } from 'lucide-react';
 
 const PageContainer = styled.div`
@@ -86,7 +86,7 @@ const VerifyButton = styled(motion.button)`
 function DietaryContent() {
   const { isAuthenticated, isLoading } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showReservationModal, setShowReservationModal] = useState(false);
+  const [showLoginFailureModal, setShowLoginFailureModal] = useState(false);
 
   const handleVerifyClick = () => {
     setShowLoginModal(true);
@@ -94,15 +94,15 @@ function DietaryContent() {
 
   const handleAuthFailed = () => {
     setShowLoginModal(false);
-    setShowReservationModal(true);
+    setShowLoginFailureModal(true);
   };
 
   const handleCloseLogin = () => {
     setShowLoginModal(false);
   };
 
-  const handleCloseReservation = () => {
-    setShowReservationModal(false);
+  const handleCloseLoginFailure = () => {
+    setShowLoginFailureModal(false);
   };
 
   if (isLoading) {
@@ -156,9 +156,9 @@ function DietaryContent() {
           onAuthFailed={handleAuthFailed}
         />
 
-        <ReservationModal
-          isOpen={showReservationModal}
-          onClose={handleCloseReservation}
+        <LoginFailureModal
+          isOpen={showLoginFailureModal}
+          onClose={handleCloseLoginFailure}
         />
       </MainContent>
     );

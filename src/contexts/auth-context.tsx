@@ -65,7 +65,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     credentials: AuthCredentials
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      const result = await AuthService.verifyCredentials(credentials);
+      // Get user agent from browser
+      const metadata = {
+        user_agent:
+          typeof window !== 'undefined'
+            ? window.navigator.userAgent
+            : undefined,
+      };
+
+      const result = await AuthService.verifyCredentials(credentials, metadata);
 
       if (result.success && result.user) {
         setUser(result.user);

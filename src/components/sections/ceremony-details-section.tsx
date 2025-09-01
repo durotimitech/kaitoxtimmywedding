@@ -112,7 +112,7 @@ export function CeremonyDetailsSection() {
     {
       icon: Clock,
       title: 'Time',
-      content: '14:00 PM',
+      content: '1:00 PM',
     },
     {
       icon: MapPin,

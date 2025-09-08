@@ -145,18 +145,18 @@ export function Navigation() {
   const pathname = usePathname();
 
   const handleNavClick = (elementId: string) => {
-    if (pathname === '/') {
+    if (pathname === '/home') {
       // If we're on the home page, just scroll
       smoothScrollTo(elementId);
     } else {
       // If we're on another page, navigate to home with the hash
-      router.push(`/#${elementId}`);
+      router.push(`/home#${elementId}`);
     }
   };
 
   // Handle hash navigation after page load
   useEffect(() => {
-    if (pathname === '/' && window.location.hash) {
+    if (pathname === '/home' && window.location.hash) {
       // Remove the # from the hash
       const elementId = window.location.hash.substring(1);
       // Wait a bit for the page to render
@@ -179,7 +179,7 @@ export function Navigation() {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <NavLink
-            onClick={() => handleNavClick('hero')}
+            onClick={() => router.push('/home')}
             whileHover={{
               color: '#D4AF37',
               scale: 1.05,
@@ -221,6 +221,8 @@ export function Navigation() {
             scale: 1.05,
             transition: { type: 'spring', stiffness: 400, damping: 17 },
           }}
+          onClick={() => router.push('/home')}
+          style={{ cursor: 'pointer' }}
         >
           <motion.div
             whileHover={{

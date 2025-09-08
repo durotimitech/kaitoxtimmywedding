@@ -1,10 +1,10 @@
 import { AuthProvider } from '@/contexts/auth-context';
-import { HomeContent } from '@/components/home-content';
+import { BankPageContent } from '@/components/bank-page-content';
 
 export default function Home() {
   return (
     <AuthProvider>
-      <HomeContent />
+      <BankPageContent />
     </AuthProvider>
   );
 }
